@@ -1,0 +1,21 @@
+{
+  "case_id": "rotatable_ballpoint_single_change",
+  "cutoff": "2026-10-19",
+  "source_patent": "US4968168A",
+  "source_url": "https://patents.google.com/patent/US4968168A/en",
+  "reference_patent": "US5944436A",
+  "reference_url": "https://patents.google.com/patent/US5944436A/en",
+  "features": [
+    {"id":"F1","text":"An outer barrel has a cylindrical connecting end and a conical tip end.","zh":"笔杆具有圆柱形连接端和锥形笔尖端。"},
+    {"id":"F2","text":"An ink reservoir tube with a ballpoint moves axially when a cap is rotated, extending or retracting the writing tip.","zh":"转动笔帽，使带圆珠笔尖的储墨管沿轴向伸出或缩回。"},
+    {"id":"F3","text":"An externally threaded hollow rod engages a tapped hole of an intermediate tube to convert rotation into limited axial movement.","zh":"空心杆外螺纹配合中间管的螺纹孔，将旋转变成有限轴向位移。"},
+    {"id":"F4","text":"A compression spring biases a non-rotatable annular engaging member into contact with a rotatable annular engaging member.","zh":"压缩弹簧使固定环形啮合件压向旋转环形啮合件。"},
+    {"id":"F5","text":"The fixed and rotatable engaging members have annular crowns of teeth.","zh":"固定和旋转啮合件具有环形齿冠。"},
+    {"id":"F6","text":"The annular tooth crowns of the fixed and rotatable engaging members are made of metal and produce audible clicking when engaging and disengaging.","zh":"两环形齿冠采用金属，啮合和脱离时发出可听到的咔嗒声。"}
+  ],
+  "mutations": [
+    {"id":"helical_pin_drive","feature_id":"F3","text":"A radial pin on the hollow rod slides in a helical groove of the intermediate tube to convert rotation into limited axial movement.","zh":"把空心杆的螺纹传动改为径向销沿螺旋槽滑动，其余五项保持不变。"},
+    {"id":"magnetic_bias","feature_id":"F4","text":"A pair of repelling annular permanent magnets biases a non-rotatable annular engaging member into contact with a rotatable annular engaging member, instead of a compression spring.","zh":"把压缩弹簧偏置改为一对相斥环形永磁体提供偏置，其余五项保持不变。"},
+    {"id":"pom_tooth_crowns","feature_id":"F6","text":"The annular tooth crowns of the fixed and rotatable engaging members are made of polyoxymethylene (POM) polymer instead of metal and still produce audible clicking when engaging and disengaging.","zh":"把环形齿冠材料从金属改为聚甲醛（POM），保留齿形与咔嗒反馈，其余五项保持不变。"}
+  ]
+}

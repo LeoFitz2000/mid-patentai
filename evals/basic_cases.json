@@ -1,0 +1,35 @@
+{
+  "dataset_version": "1.0",
+  "provenance": "synthetic_teaching_cases_not_real_patent_gold",
+  "cutoff": "2024-01-01",
+  "cases": [
+    {"id":"single_document_all_features","expected":"potential_novelty_risk","features":["A","B","C"],"documents":[{"id":"D1","text":"A B C","statuses":["disclosed","disclosed","disclosed"]}]},
+    {"id":"reviewed_chinese_synonym_same_result","expected":"potential_novelty_risk","features":["压力感测器","控制单元"],"documents":[{"id":"D1","text":"压力传感器连接控制器。","statuses":["disclosed","disclosed"],"quotes":["压力传感器","控制器"]}]},
+    {"id":"reviewed_english_synonym_same_result","expected":"potential_novelty_risk","features":["压力传感器","控制器"],"documents":[{"id":"D1","text":"A pressure transducer is connected to a control unit.","statuses":["disclosed","disclosed"],"quotes":["pressure transducer","control unit"]}]},
+    {"id":"do_not_combine_documents","expected":"no_complete_disclosure_found","features":["A","B","C"],"documents":[{"id":"D1","text":"A B","statuses":["disclosed","disclosed","not_found"]},{"id":"D2","text":"C","statuses":["not_found","not_found","disclosed"]}]},
+    {"id":"unknown_is_not_absent","expected":"insufficient_evidence","features":["A","B","C"],"documents":[{"id":"D1","text":"A B","statuses":["disclosed","disclosed","unknown"]}]},
+    {"id":"unreviewed_model_is_not_gold","expected":"insufficient_evidence","features":["A","B","C"],"documents":[{"id":"D1","text":"A B C","statuses":["disclosed","disclosed","disclosed"],"reviewed":false}]},
+    {"id":"mutually_exclusive_schemes","expected":"insufficient_evidence","features":["A","B","C"],"documents":[{"id":"D1","text":"方案一 A B。方案二 C。","statuses":["disclosed","disclosed","disclosed"],"scheme_ids":["scheme1","scheme1","scheme2"]}]},
+    {"id":"later_publication_is_not_prior_art","expected":"insufficient_evidence","features":["A","B","C"],"documents":[{"id":"USLATER","text":"A B C","publication_date":"2025-01-01","filing_date":"2024-02-01","statuses":["disclosed","disclosed","disclosed"]}]},
+    {"id":"same_day_not_automatically_prior","expected":"insufficient_evidence","features":["A","B","C"],"documents":[{"id":"USDAY","text":"A B C","publication_date":"2024-01-01","statuses":["disclosed","disclosed","disclosed"]}]},
+    {"id":"cn_conflicting_application_review","expected":"insufficient_evidence","features":["A","B","C"],"documents":[{"id":"CNLATER","text":"A B C","publication_date":"2025-01-01","filing_date":"2023-01-01","statuses":["disclosed","disclosed","disclosed"]}]},
+    {"id":"missing_publication_date","expected":"insufficient_evidence","features":["A"],"documents":[{"id":"D1","text":"A","publication_date":"","statuses":["disclosed"]}]},
+    {"id":"snippet_not_full_document","expected":"insufficient_evidence","features":["A","B","C"],"documents":[{"id":"D1","text":"A B C","complete":false,"statuses":["disclosed","disclosed","disclosed"]}]},
+    {"id":"fabricated_quote_rejected","expected":"insufficient_evidence","features":["A","B","C"],"documents":[{"id":"D1","text":"A B","statuses":["disclosed","disclosed","disclosed"],"quotes":["A","B","invented C"]}]},
+    {"id":"empty_search_not_safe","expected":"insufficient_evidence","features":["A"],"documents":[]},
+    {"id":"search_failure_not_safe","expected":"insufficient_evidence","features":["A"],"documents":[],"errors":["Google Patents 检索超时"]},
+    {"id":"negation_needs_review","expected":"insufficient_evidence","features":["压力传感器"],"documents":[{"id":"D1","text":"该装置不包括压力传感器。","statuses":["unknown"]}]},
+    {"id":"new_extra_feature_not_ignored","expected":"no_complete_disclosure_found","features":["A","B","C","D"],"documents":[{"id":"D1","text":"A B C","statuses":["disclosed","disclosed","disclosed","not_found"]}]},
+    {"id":"legacy_fto_missing_feature","task":"fto","product":"A+B，已核实缺少C且无等同","expected":"out_of_scope","features":["A","B","C"],"documents":[]},
+    {"id":"legacy_fto_unknown_feature","task":"fto","product":"仅知道A+B，C信息缺失","expected":"out_of_scope","features":["A","B","C"],"documents":[]},
+    {"id":"legacy_fto_added_feature","task":"fto","product":"开放式A+B+C权利要求，产品为A+B+C+D","expected":"out_of_scope","features":["A","B","C"],"documents":[]}
+  ],
+  "synonym_cases": [
+    {"id":"chinese_synonym","query":"压力感测器","target":"压力传感器与控制器连接。"},
+    {"id":"english_synonym","query":"pressure transducer","target":"压力传感器与控制器连接。"},
+    {"id":"english_case_and_spacing","query":"  PRESSURE   SENSOR ","target":"压力传感器与控制器连接。"},
+    {"id":"controller_alias","query":"control unit","target":"控制器接收压力数据。"},
+    {"id":"relation_alias","query":"压力感测器相连控制单元","target":"压力传感器连接控制器。"},
+    {"id":"word_order_retrieval","query":"控制器连接压力传感器","target":"压力传感器连接控制器。"}
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "created_at": "2026-10-19T14:35:38.770614+00:00",
+  "seed": 3862674471,
+  "mutation": {
+    "id": "pom_tooth_crowns",
+    "feature_id": "F6",
+    "text": "The annular tooth crowns of the fixed and rotatable engaging members are made of polyoxymethylene (POM) polymer instead of metal and still produce audible clicking when engaging and disengaging.",
+    "zh": "把环形齿冠材料从金属改为聚甲醛（POM），保留齿形与咔嗒反馈，其余五项保持不变。"
+  },
+  "changed_feature_count": 1,
+  "source_urls": [
+    "https://patents.google.com/patent/US4968168A/en",
+    "https://patents.google.com/patent/US5944436A/en"
+  ],
+  "model": "deepseek-flash",
+  "model_calls": [
+    {
+      "http_status": 200,
+      "elapsed_seconds": 4.56,
+      "response_id": "a58ac27d-e158-419e-afa0-d851e89d8759",
+      "model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 7703,
+        "completion_tokens": 991,
+        "total_tokens": 8694,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 7703
+      },
+      "finish_reason": "stop"
+    },
+    {
+      "http_status": 200,
+      "elapsed_seconds": 7.45,
+      "response_id": "2ea61fc0-0a6a-4251-8da2-7d509b127605",
+      "model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 7715,
+        "completion_tokens": 1574,
+        "total_tokens": 9289,
+        "prompt_tokens_details": {
+          "cached_tokens": 128
+        },
+        "prompt_cache_hit_tokens": 128,
+        "prompt_cache_miss_tokens": 7587
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "search_probe": {
+    "query": "rotatable ballpoint pen pom tooth crowns",
+    "ok": true,
+    "candidates": [
+      {
+        "title": "Knock type advancing container",
+        "content": "A knock type advancing container which, in the initial stage of rotational operation thereof, can produce a rotational force without relying only on a spring force and on the shape of a cam, which uses a less number of parts, and can advance a fixed amount of contents by the use of a screw. The …",
+        "url": "https://patents.google.com/patent/WO2009125868A1/en",
+        "publication_number": "WO2009125868A1"
+      },
+      {
+        "title": "Knock-type advancing container",
+        "content": "[PROBLEMS] To clearly determine that the contents have been fed out without causing discomfort to the user, reliably preventing malfunction of the cam, and increasing the number of parts. A knock-type feeding container capable of metering out a constant amount is provided. When a user knocks a …",
+        "url": "https://patents.google.com/patent/JP2011072488A/en",
+        "publication_number": "JP2011072488A"
+      },
+      {
+        "title": "Electrical body care brush",
+        "content": "An attachment brush part for an electrical body care brush, in particular electrical toothbrush (1), wherein the attachment brush part (2) is designed in a multi-part manner and comprises: - an attachment brush housing (21), comprising a housing head (42) which is arranged in a brush-head-side end …",
+        "url": "https://patents.google.com/patent/EP3381404B1/en",
+        "publication_number": "EP3381404B1"
+      },
+      {
+        "title": "drug delivery system",
+        "content": "A medicament container (22) having a container body (24) configured to hold a medicament (25) and defining an outlet (28 ) , the medicament including a piston (26) disposed within the container body. a container; A drive ribbon (40, 40B) having a distal end ( 56, 56B) and a proximal end (58, 58B) …",
+        "url": "https://patents.google.com/patent/JP7268126B2/en",
+        "publication_number": "JP7268126B2"
+      },
+      {
+        "title": "Hand toothbrush",
+        "content": "Manual toothbrush, comprising a handle (1) with a longitudinal axis A G , and a plug-on part (60) which can be attached to the handle (1), wherein the handle (1) has a hand body (ld) having a base body (5) and the plug-on part (60) has a base body, wherein a plug-like coupling structure (40) …",
+        "url": "https://patents.google.com/patent/EP3542667B1/en",
+        "publication_number": "EP3542667B1"
+      }
+    ]
+  },
+  "decisions": {
+    "original": "insufficient_evidence",
+    "modified": "insufficient_evidence"
+  },
+  "model_statuses": {
+    "original": "success",
+    "modified": "success"
+  },
+  "human_review_performed": false,
+  "basic_eval_summary": {
+    "langgraph": {
+      "passed": 20,
+      "total": 20
+    },
+    "llamaindex": {
+      "passed": 10,
+      "total": 10
+    },
+    "deepeval": {
+      "passed": 4,
+      "total": 4
+    }
+  },
+  "source_retrieval": [
+    {
+      "id": "US4968168A",
+      "url": "https://patents.google.com/patent/US4968168A/en",
+      "http_status": 200
+    },
+    {
+      "id": "US5944436A",
+      "url": "https://patents.google.com/patent/US5944436A/en",
+      "http_status": 200
+    }
+  ]
+}

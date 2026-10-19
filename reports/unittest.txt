@@ -1,0 +1,44 @@
+test_changed_features_invalidate_old_report (test_app.AppFlowTests.test_changed_features_invalidate_old_report) ... 2026-10-19 22:40:31.695 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_first_screen_has_no_network_or_paid_model_call (test_app.AppFlowTests.test_first_screen_has_no_network_or_paid_model_call) ... 2026-10-19 22:40:33.889 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_manual_evidence_does_not_auto_judge_or_send_model (test_app.AppFlowTests.test_manual_evidence_does_not_auto_judge_or_send_model) ... 2026-10-19 22:40:34.184 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_model_is_called_only_after_payload_confirmation (test_app.AppFlowTests.test_model_is_called_only_after_payload_confirmation) ... 2026-10-19 22:40:34.516 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_offline_basic_eval_button_works_without_model (test_app.AppFlowTests.test_offline_basic_eval_button_works_without_model) ... 2026-10-19 22:40:34.932 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_reviewed_suggestion_produces_report_and_changed_confirmation_invalidates_it (test_app.AppFlowTests.test_reviewed_suggestion_produces_report_and_changed_confirmation_invalidates_it) ... 2026-10-19 22:40:35.404 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-19 22:40:35.752 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-19 22:40:35.752 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_basic_report_includes_each_skill_and_judge_negative_controls (test_novelty_skills.DeepEvalSkillEvals.test_basic_report_includes_each_skill_and_judge_negative_controls) ... ok
+test_synthetic_cases_cannot_enter_production (test_novelty_skills.DeepEvalSkillEvals.test_synthetic_cases_cannot_enter_production) ... ok
+test_all_labeled_boundary_cases (test_novelty_skills.LangGraphSkillEvals.test_all_labeled_boundary_cases) ... ok
+test_empty_snapshots_do_not_use_network (test_novelty_skills.LangGraphSkillEvals.test_empty_snapshots_do_not_use_network) ... ok
+test_expansion_search_deduplicates_publication_languages (test_novelty_skills.LangGraphSkillEvals.test_expansion_search_deduplicates_publication_languages) ... ok
+test_failed_search_stops_without_model_or_fake_evidence (test_novelty_skills.LangGraphSkillEvals.test_failed_search_stops_without_model_or_fake_evidence) ... ok
+test_features_preserve_relations_numbers_and_negation (test_novelty_skills.LangGraphSkillEvals.test_features_preserve_relations_numbers_and_negation) ... ok
+test_fto_requests_do_not_use_network (test_novelty_skills.LangGraphSkillEvals.test_fto_requests_do_not_use_network) ... ok
+test_conflicting_custom_synonyms_are_rejected (test_novelty_skills.LlamaIndexSkillEvals.test_conflicting_custom_synonyms_are_rejected) ... ok
+test_custom_group_can_extend_an_existing_alias (test_novelty_skills.LlamaIndexSkillEvals.test_custom_group_can_extend_an_existing_alias) ... ok
+test_differences_are_not_normalized_into_synonyms (test_novelty_skills.LlamaIndexSkillEvals.test_differences_are_not_normalized_into_synonyms) ... ok
+test_negated_synonym_candidate_never_auto_disclosed (test_novelty_skills.LlamaIndexSkillEvals.test_negated_synonym_candidate_never_auto_disclosed) ... ok
+test_synonyms_rank_same_original_source_first (test_novelty_skills.LlamaIndexSkillEvals.test_synonyms_rank_same_original_source_first) ... ok
+test_unknown_terms_have_finite_scores_and_do_not_match (test_novelty_skills.LlamaIndexSkillEvals.test_unknown_terms_have_finite_scores_and_do_not_match) ... ok
+test_exported_snapshot_roundtrip_and_tampering (test_novelty_skills.SourceAndModelBoundaryTests.test_exported_snapshot_roundtrip_and_tampering) ... ok
+test_google_page_extracts_dates_and_flat_claims_without_combining (test_novelty_skills.SourceAndModelBoundaryTests.test_google_page_extracts_dates_and_flat_claims_without_combining) ... ok
+test_model_needs_consent_and_unverifiable_quote_is_rejected (test_novelty_skills.SourceAndModelBoundaryTests.test_model_needs_consent_and_unverifiable_quote_is_rejected) ... ok
+test_model_suggestions_always_require_human_review (test_novelty_skills.SourceAndModelBoundaryTests.test_model_suggestions_always_require_human_review) ... ok
+test_untrusted_host_and_redirect_are_rejected (test_novelty_skills.SourceAndModelBoundaryTests.test_untrusted_host_and_redirect_are_rejected) ... ok
+test_confirmation_guard_prevents_external_stage (test_workflow.WorkflowTests.test_confirmation_guard_prevents_external_stage) ... ok
+test_empty_search_is_insufficient_evidence (test_workflow.WorkflowTests.test_empty_search_is_insufficient_evidence) ... ok
+test_external_response_is_validated_without_fake_fallback (test_workflow.WorkflowTests.test_external_response_is_validated_without_fake_fallback) ... ok
+test_llm_http_failure_never_exposes_key (test_workflow.WorkflowTests.test_llm_http_failure_never_exposes_key) ... ok
+test_ranker_eval_uses_labeled_urls (test_workflow.WorkflowTests.test_ranker_eval_uses_labeled_urls) ... ok
+test_reference_filter_deduplicates_and_rejects_untrusted_host (test_workflow.WorkflowTests.test_reference_filter_deduplicates_and_rejects_untrusted_host) ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 4.528s
+
+OK

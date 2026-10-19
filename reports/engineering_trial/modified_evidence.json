@@ -1,0 +1,559 @@
+{
+  "created_at": "2026-10-19T14:35:38.640805+00:00",
+  "task": "CN_novelty_precheck",
+  "scope": "Google Patents；整套用户确认要素；不展开独立/从属权利要求",
+  "cutoff": "2026-10-19",
+  "invention": "旋转咔嗒圆珠笔：modified",
+  "features": [
+    {
+      "id": "F1",
+      "text": "An outer barrel has a cylindrical connecting end and a conical tip end."
+    },
+    {
+      "id": "F2",
+      "text": "An ink reservoir tube with a ballpoint moves axially when a cap is rotated, extending or retracting the writing tip."
+    },
+    {
+      "id": "F3",
+      "text": "An externally threaded hollow rod engages a tapped hole of an intermediate tube to convert rotation into limited axial movement."
+    },
+    {
+      "id": "F4",
+      "text": "A compression spring biases a non-rotatable annular engaging member into contact with a rotatable annular engaging member."
+    },
+    {
+      "id": "F5",
+      "text": "The fixed and rotatable engaging members have annular crowns of teeth."
+    },
+    {
+      "id": "F6",
+      "text": "The annular tooth crowns of the fixed and rotatable engaging members are made of polyoxymethylene (POM) polymer instead of metal and still produce audible clicking when engaging and disengaging."
+    }
+  ],
+  "documents": [
+    {
+      "id": "US4968168A",
+      "title": "Ballpoint pen with clicking",
+      "url": "https://patents.google.com/patent/US4968168A/en",
+      "publication_date": "1990-11-06",
+      "sections": [
+        {
+          "id": "abstract-1",
+          "text": "Abstract This invention discloses a ballpoint pen which is capable of generating a \"click\" sound when the first tube of the pen is rotated over either of two predetermined positions. The ballpoint pen includes a first engaging member, a second engaging member, a medium tube, an ink reservoir tube, a sleeve, a compression spring, a support, and a rod. Thus, the main principle of the present invention is to cause a \"click\" sound to be produced as the ballpoint of the pen is extended or withdrawn, through the interaction of the first and second engaging members when the first tube of the pen is rotated."
+        },
+        {
+          "id": "claim-2",
+          "text": "1. A rotatable, dual-sectional ball point pen to produce clicking sounds upon adjustment comprising: (a) an outer barrel having a cylindrical connecting first end and a conical tip second end; (b) an annular connector adapted to fit inside the outer barrel at its first connecting end, said annular connector having on its side opposite the outer barrel side first seating means for holding biasing means and second inner annular seating means and third outer annular seating means; (c) a non-rotatable sleeve adapted to fit the second inner annular seating means of the connector at one end and adapted to hole a fixed engaging member at its other end; (d) biasing means inside the non-rotatable sleeve adapted to seat into at one end the biasing seating means of the annular connector; (e) an annular fixed engaging member adapted to fit into the non-rotatable sleeve at its holding end and thereby seat the biasing means at its end opposite the annular connector; (f) an intermediate tube fitted at one first end to seat into the third outer annular seating means of the annular connector, also surrounding the non-rotatable sleeve, and fitted at the opposite second end with a tapped hole; (g) a rotatable hollow rod adapted to fit into the tapped hole at the second end of the intermediate tube, having axial limiting means upon rotation; (h) a cap at the first outer end of the rotatable hollow rod so that rotating the cap rotates the rotatable hollow rod; (i) an annular rotatable engaging member fitted onto the second inner end of the rotatable hollow rod and adapted to engage the annular fixed engaging member when the fixed engaging member is biased into the rotatable engaging member; (j) at least two small bosses externally on the intermediate tube; and (k) an inner tubular ink reservoir having a ball point extendable outside the second conical tip end of the outer barrel extending through the annular connector, through the biasing means; through the fixed annular engaging member, through the rotatable annular engaging member, through the rotatable hollow rod and fixed into the cap; whereby rotating the cap of the hollow rotatable rod in one direction moves the hollow rod and the rotatable engaging member to its inner limit against the biasing means of the fixed engaging member and rotating the cap in the opposite direction moves the rotatable engaging member and the hollow rod to its limit in the same direction as the force of the biasing means, the engaging means making a clicking sound as they engage and disengage and as they reach either limit of rotation and hence axial movement of the hollow rod and the rotating engagement means."
+        },
+        {
+          "id": "claim-3",
+          "text": "2. A rotatable ball point pen as in claim 1, wherein the engaging members have annular crowns of teeth."
+        },
+        {
+          "id": "claim-4",
+          "text": "3. A rotatable ball point pen as in claim 2, wherein the annular crowns of teeth of the fixed and rotatable, engaging members are of metal whereby upon engaging and disengaging an audible clicking sound is made."
+        },
+        {
+          "id": "claim-5",
+          "text": "4. A rotatable ball point pen as in claim 1, wherein the biasing means is a spring."
+        },
+        {
+          "id": "claim-6",
+          "text": "5. A rotatable ball point pen as in claim 1, wherein the hollow rod is externally threaded to fit into the tapped hole at the cap end of the intermediate tube so that inward axial motion of the hollow rod is stopped at its limit by the cap and outward axial motion of the hollow rod is stopped at its limit by the rotatable engaging member against the cap end of the intermediate tube."
+        },
+        {
+          "id": "claim-7",
+          "text": "6. A rotatable ball point pen as in claim 1, wherein the first seating means of the annular connector for the biasing means is an annular cup, the second seating means of the annular connector is a larger annular groove, and the third seating means of the annular connector is an annular groove."
+        },
+        {
+          "id": "claim-8",
+          "text": "7. A rotatable ball point pen as in claim 1, wherein the at least two small protrusions on the exterior of the intermediate tube frictionally support a removable capping barrel adapted to cover the cap and intermediate tube and said capping barrel is provided with a clip to hold the ball point pen to a planar surface."
+        },
+        {
+          "id": "claim-9",
+          "text": "8. A rotatable ball point pen as in claim 1, wherein the interior surface of the non-rotatable sleeve is adapted to frictionally hold the fixed engaging member on its exterior surface by slidable tongue and groove means."
+        },
+        {
+          "id": "claim-10",
+          "text": "9. A rotatable ball point pen as in claim 1, wherein the rotatable engagement means comprises a radial pin projecting from the external surface of the rotatable hollow rod and the fixed engagement means comprises a helical groove in the interior of the sleeve adapted to receive the rotatable radial pin."
+        },
+        {
+          "id": "claim-11",
+          "text": "10. A rotatable ball point pen as in claim 9, wherein the radial pin is in the form of a nub."
+        },
+        {
+          "id": "description-12",
+          "text": "This invention relates to a ballpoint pen, and more particularly to a rotatable ballpoint pen capable of generating a \"click\" sound when the first tube of the pen is rotated to either one of two predetermined positions."
+        },
+        {
+          "id": "description-13",
+          "text": "It is well known that rotatable ballpoint pens are commonly used nowadays. However, the known rotatable ballpoint pens still suffer from many defects. For example, the ballpoint of the pen tends to either not the fully extended or not be fully withdrawn, in relation to the pen case, when the pen is in use or at rest. This presents an inconvenience to the user. Another defect becomes obvious when the associated mechanism of the ballpoint of the pen is damaged due to excessive rotation on the part of the user. Thus, an attempt has been made by the applicant to offer a rotatable ballpoint pen which can generate a \"click\" sound so as to remind or warn the user that the ballpoint of the pen has reached either of two predetermined positions. In view of the features of this invention, it is certain that the aforesaid known defects can be completely overcome."
+        },
+        {
+          "id": "description-14",
+          "text": "It is accordingly a primary object of the present invention to provide a rotatable ballpoint pen which can generate a \"click\" sound when the first tube of the pen is rotated to either one of two predetermined positions."
+        },
+        {
+          "id": "description-15",
+          "text": "It is another object of the present invention to provide a rotatable ballpoint pen which may be enhanced by means of the sound generated thus attracting consumers' interest."
+        },
+        {
+          "id": "description-16",
+          "text": "According to the present invention, a ballpoint pen has an elongated outer tube with a first end and a second end, the outer tube being rotatably joined by a first tube at the first end and a second tube at the second end; and an inner tube for a reservoir of ink, having an end with a ballpoint for writing purposes, the inner tube being disposed within the outer tube, protruding the ballpoint from the second end of the second tube, said inner tube being adapted to be axially and reversibly moved by rotating the first tube, enabling the ballpoint to retract into the second end."
+        },
+        {
+          "id": "description-17",
+          "text": "The improvement comprises a rod having a first end facing the first end of the outer tube and a second end facing the second end of the outer tube, the rod being disposed within the first tube and adapted to be axially and reversibly moved by rotating the first tube between a first position, where the ballpoint is protruded to a first predetermined place, and a second position, where the ballpoint is retracted to a second predetermired place, said first tube being continuously rotated until the rod reaches one of the predetermined positions; a first engaging means fixedly disposed at the second end of the rod; and a second engaging means fixedly disposed around the inner tube, the second engaging means being biased to make engagement with the first engaging means; whereby a \"click\" sound can be created when the ballpoint is moved to one of the predetermined places during the rotation of the first tube."
+        },
+        {
+          "id": "description-18",
+          "text": "Preferably, the first and second engaging means are made of a metal material so as to create a clear sound resulting from the collision between said two engaging means when the pen is rotated to either one of two predetermined positions during the rotation of the first engaging means and the axial displacement of the second engaging means."
+        },
+        {
+          "id": "description-19",
+          "text": "Other advantages and characteristics of the present invention will become clear from the following description of preferred embodiments when read in conjunction with the accompanying drawings."
+        },
+        {
+          "id": "description-20",
+          "text": "FIG. 1 is a sectional view of a rotatable ballpoint pen according to the present invention showing the condition of the rod of the pen when rotated to a first predetermined position;"
+        },
+        {
+          "id": "description-21",
+          "text": "FIG. 2 is an exploded view of a rotatable ballpoint pen according to the present invention;"
+        },
+        {
+          "id": "description-22",
+          "text": "FIG. 3 is a sectional view of a rotatable ballpoint pen showing the condition of the rod of the pen when withdrawn to the second predetermined position;"
+        },
+        {
+          "id": "description-23",
+          "text": "FIG. 4 is a sectional view of another embodiment of a rotatable ballpoint pen according to the present invention showing the condition of the rod of the pen when moved to the first predetermined position;"
+        },
+        {
+          "id": "description-24",
+          "text": "FIG. 5 is a sectional view of another embodiment of a rotatable ballpoint pen according to the present invention showing the condition of the rod of the pen when moved to the second predetermined position;"
+        },
+        {
+          "id": "description-25",
+          "text": "FIG. 6 is an exploded view of a rod and a medium tube of another embodiment according to the present invention."
+        },
+        {
+          "id": "description-26",
+          "text": "Referring to FIGS. 1 and 2, a rotatable ballpoint pen A which comprises an elongated outer tube 1, an intermediate tube 10, an inner tube 4, a hollow rod 5, a sleeve 7, an annular connector 8, a first engaging member 6, a second engaging member 9, and a compression spring 74. The outer tube 1 is substantially an elongated tube having a first cap end 12 and a second conical end 13. The outer tube 1 has two sections; a first tubular section 2 with said first end 12 and second tubular section 3 with said second end 13. The connector 8 is fixed in the second tube 3. The intermediate tube 10 which is sleeved within the first tube 2 has one end 32 on which is disposed a female thread 321 for accommodating the male thread 522 on the hollow rod 5, and another end 33 which is rotatably seated in the connector 8. It should be noted that the intermediate tube 10 can be rotated past a pair of bosses 31 provided on the outer surface of the intermediate tube 10 to engage with the first tube 2 when the first tube 2 is rotated in a direction opposite to the second tube 3. The inner tube 4 is essentially an ink reservoir tube filled with ink, having a pointed end with ballpoint 16 for writing purposes. The inner tube 4 disposed within the outer tube 1 can project the ballpoint 16 from the second conical end 13 of the second tube 3 and be and be axially reversibly moved forward and back by rotating the first tube 2 so as to retract the ballpoint 16 into the second tube 3. The ink reservoir tube 4, which passes through the connector 8, the compression spring 74, the second engaging member 9, the first engaging member 6, and the hollow rod 5, is connected at one end to a cap 52. All the aforesaid members are hollow members which may be passed through by the ink reservoir tube 4. In addition, the hollow rod 5 has a first enlarged end 51 contacts the outside of end 32 of the medium tube 10 and a second position, in which the first engaging member 6 contacts the inside of end 32 as the intermediate tube 10 is rotated, together with the first section 2. Cap 51 at the first outer end of hollow rod 5 limits the forward axial movement of the rod 5. In addition, the connector 8 is placed between the first tubular section 2 and the second tubular section 3 to serve as a blocking means, preventing the first tubular section 2 from entering the second tubular section 3."
+        },
+        {
+          "id": "description-27",
+          "text": "The first engaging member 6 is fixedly mounted on the threaded end 522 of the hollow rod 5. In addition, the second engaging member 9 is externally mounted to the inside of sleeve 7 around the ink reservoir tube 4 and is forced by spring 74 seated in base 90 to engage with the first engaging member 6 of engaging member 9. First engaging member 6 and second engaging member 9 are seated together by the interlocking of two annular toothed racks 61. 92, as shown in FIGS. 1 and 3. Compression spring 74 is held within sleeves 7, one end of which is engaged to connector 8 and the other end of which is engaged to the second engaging member 9, thereby biasing the second engaging member 9 to engage with the first engaging member 6. It should be noted that the second engaging member 9 has a plurality of tongues 91 formed at its outer surface so as to slide along the grooves 73 disposed internally at the one outer first end of sleeve 7."
+        },
+        {
+          "id": "description-28",
+          "text": "In operation, as shown in FIG. 1, hollow rod 5 is thrust to its first extended limiting position by turning the first tubular section 2 so that the ballpoint 16 is completely extended out from the second tubular section 3. Turning of the first tubular section 2 causes the rod 5 to rotate so that the first engaging member 6 rotates and clashes with the second engaging member 9 which is fixed. A \"clicking\" sound is thereby created. Similarly, when hollow rod 5 is in its second withdrawn limiting position, the first engaging member 6 rotates and clicks with fixed engaging member 9 as shown in FIG. 3."
+        },
+        {
+          "id": "description-29",
+          "text": "The first and second engaging members 6, 9, are preferably made of metal material to create a \"clicking\" sound. Preferably, the ballpoint pen is constructed so that ballpoint 16 extends out from tapered seated end 13, when the first tubular section 2 is rotated clockwise and ballpoint 16 is withdrawn into the second tubular section 3 when the first tubular section 2 is rotated counterclockwise."
+        },
+        {
+          "id": "description-30",
+          "text": "FIGS. 4, 5 and 6 show another embodiment of a ballpoint pen of the present invention. As shown in the drawings, a hollow rod 42 has a helical bar 421 protruding at its lower outer end so as to slide along helical slot 321 of the intermediate tube 20. Slot 321 is in the shape of a partial helix and has an upper limit position 322 and a lower limit position 323 as shown in FIG. 4. On the contrary, the ballpoint 26 is fully withdrawn into the chamber of the pen when the bar 421 of the hollow rod 42 is slid to the upper limit position 322 as shown in FIG. 5. When the bar 421 is moved from upper limit position 322 to lower limit position 323, intermediate tube 20 rotates rather than moving axially. Similarly, a \"clicking\" sound can be created as the first engaging member 6' clashes the second engaging member 9'."
+        },
+        {
+          "id": "description-31",
+          "text": "While certain preferred embodiments have been described above, it will be readily apparent to those skilled in the art that a number of other modifications and changes can be made without departing from the scope of the invention."
+        }
+      ],
+      "filing_date": "1989-01-04",
+      "priority_date": "1989-01-04",
+      "source_kind": "google_patents_page",
+      "retrieved_at": "2026-10-19T14:06:28.047797+00:00",
+      "complete": true,
+      "error": "",
+      "snapshot_hash": "7ecfd425338b4be99d918fd63540ac6fda8243c5b2c99f56422eb5cb376a512b"
+    },
+    {
+      "id": "US5944436A",
+      "title": "Pen possible to sound",
+      "url": "https://patents.google.com/patent/US5944436A/en",
+      "publication_date": "1999-08-31",
+      "sections": [
+        {
+          "id": "abstract-1",
+          "text": "Abstract A pen possible to sound includes a housing, an ink holder, a fit member, a gear set, and an operative member combined together. An elastic strip is provided in an intermediate portion of the housing, and the ink holder is movably located in a lower portion of the housing. An operative member is positioned in and on the outer surface of the housing, having a rack engaging a pinion of a main gear of the gear set. If the operative member is repeatedly pushed down, the elastic strip is snapped by an eccentric gear of the gear set, giving out sounds."
+        },
+        {
+          "id": "claim-2",
+          "text": "1. A pen possible to sound comprising a housing, an ink holder, a fit member, a gear set, and an operative member as components combined together; said housing consisting of two half housings combined tightly together, having an intermediate portion in which an elastic strip is located; said ink holder having a ball point at a lower end for writing, positioned in a lower portion of said housing, surrounded by a coil spring, said coil spring having one end hooking a projection on said ink holder and the other end hooking a groove of said housing, an end of said ink holder fitting in said fit member; said fit member having a U-shaped elastic portion, a stud provided on an outer side of said elastic portion to engage or disengage from a hole provided in said housing; said operative member having a push portion located on an outer surface of said housing, a rack on an inner side, an elongate member extending toward the lower portion of the housing from said rack and contacting and able to push said fit member downward, a press portion provided on one end to push one end of a coil spring disposed in a compartment formed on the outer surface of said housing; and said gear set contained in an upper portion of said housing, consisting of a main gear, a subordinate gear, said main gear consisting of a pinion engaging said rack of said operative member and a large gear, said subordinate gear consisting of a pinion engaging said large gear of said main gear and an eccentric gear engaging said elastic strip; whereby said operative member is pressed down to project said ball point so that a tip is disposed outside of said housing and to rotate said main gear which then rotates said subordinate gear to let said eccentric gear rotate to snap said elastic strip, which then gives out sounds."
+        },
+        {
+          "id": "claim-3",
+          "text": "2. The pen possible to sound as claimed in claim 1, wherein said housing has a securing groove formed in the intermediate portion, a round securing member is provided to fit in said securing groove, said elastic strip is fixed on one side of said securing member, and said elongate member of said operative member protrudes through said securing member."
+        },
+        {
+          "id": "claim-4",
+          "text": "3. The pen possible to sound as claimed in claim 1, wherein said fit member has a guide portion formed respectively on an upper side and a lower side to fit in a guide groove formed oppositely in the housing."
+        },
+        {
+          "id": "claim-5",
+          "text": "4. The pen possible to sound as claimed in claim 1, wherein said said gear set further includes a transmitting gear and a power gear, said transmitting gear consists of a pinion engaging said large gear of said main gear and a large gear, and said power gear consists of a pinion engaging said large gear of said transmitting gear and a weight."
+        },
+        {
+          "id": "claim-6",
+          "text": "5. The pen possible to sound as claimed in claim 1 or 4, wherein said pinion of said main gear and said large gear respectively have an engage structure, wherein said pinion has elastic curved ratchet teeth and said large gear has a recess in a side and a plurality of ratchet teeth formed around said recess, said elastic curved ratchet teeth of said pinion engage with said ratchet teeth of said large gear when said pinion is rotated clockwise, said elastic curved ratchet teeth of said pinion cannot engage said ratchet teeth of said large gear when said pinion is rotated counterclockwise so that said large gear rotates only clockwise."
+        },
+        {
+          "id": "claim-7",
+          "text": "6. The pen possible to sound as claimed in claim 1, wherein said housing has several small sound holes spaced apart in a proper location."
+        },
+        {
+          "id": "claim-8",
+          "text": "7. The pen possible to sound as claimed in claim 1, wherein said housing further has an adjust hole near said elastic strip for adjusting the curvature of said elastic strip, and a cap is provided to close said adjust hole."
+        },
+        {
+          "id": "claim-9",
+          "text": "8. The pen possible to sound as claimed in claim 1, wherein said housing further has its upper end fixed with a decorative head, having a post portion and a large plate portion under said post portion, and said post portion engages tightly a hole in the upper end of said housing."
+        },
+        {
+          "id": "description-10",
+          "text": "This invention relates to a pen possible to sound, particularly to one sounding out interesting sounds by repeatedly pushing a push block provided in a pen."
+        },
+        {
+          "id": "description-11",
+          "text": "So far, pens possible to give out sounds have not been available in market."
+        },
+        {
+          "id": "description-12",
+          "text": "This invention has been devised to offer a kind of pen possible to sound for consumers to choose."
+        },
+        {
+          "id": "description-13",
+          "text": "A main feature of the invention is an elastic strip provided in the housing to be snapped to sound by an eccentric gear of the gear set when an operative member located in and on an outer surface of a housing is pushed down to move a ball point end of a ink holder out of the housing for writing."
+        },
+        {
+          "id": "description-14",
+          "text": "This invention will be better understood by referring to the accompanying drawings, wherein:"
+        },
+        {
+          "id": "description-15",
+          "text": "FIG. 1 is an exploded perspective view of a pen possible to sound of the present invention;"
+        },
+        {
+          "id": "description-16",
+          "text": "FIG. 2 is a cross-sectional view of the pen possible to sound of the present invention;"
+        },
+        {
+          "id": "description-17",
+          "text": "FIG. 3 is a partial cross-sectional view of the pen possible to sound, with a ink holder not moved out of a housing, of the present invention;"
+        },
+        {
+          "id": "description-18",
+          "text": "FIG. 4 is a side view of an operative member combined with a gear set and the operative direction showed in the present invention;"
+        },
+        {
+          "id": "description-19",
+          "text": "FIG. 5 is a side view of a large gear of a main gear engaging a pinion of the main gear in the present invention;"
+        },
+        {
+          "id": "description-20",
+          "text": "FIG. 6 is a side view of the large gear of the main gear not engaging the pinion of the main wheel in the present invention;"
+        },
+        {
+          "id": "description-21",
+          "text": "FIG. 7 is a side cross-sectional view of the operative member pressed down in the pen possible to sound in the present invention;"
+        },
+        {
+          "id": "description-22",
+          "text": "FIG. 8 is a partial cross-sectional view of the pen, with the ink holder extending out of the housing in the present invention; and,"
+        },
+        {
+          "id": "description-23",
+          "text": "FIG. 9 is a side view of the operative member released to move back and up to an original position in the present invention."
+        },
+        {
+          "id": "description-24",
+          "text": "A pen possible to sound in the present invention, as shown in FIG. 1, includes a housing 1, a securing member 2, a pin holder 3, a fit member 4, an operative member 5, a gear set 6 and a decorative head 7 as components combined together."
+        },
+        {
+          "id": "description-25",
+          "text": "The housing 1 consists of two half housings respectively having a securing groove 11 in an intermediate portion for disposing the securing member 2 therein, a lower half portion for the ink holder 3 to position therein. The housing 1 further has plural small sound holes 141 formed in the upper portion, and an adjust hole 15 formed in an intermediate portion near an elastic strip 21 for adjusting the curvature of the elastic strip 21, and a cap 16 provided to close the adjust hole 15."
+        },
+        {
+          "id": "description-26",
+          "text": "The securing member 2 has a circular shape, and the elastic strip 21 is formed to extend to the left side from the circular body."
+        },
+        {
+          "id": "description-27",
+          "text": "The ink holder 3 is surrounded by a long coil spring 31, which has two ends respectively hooking with a small projection 32 on an outer surface of the ink holder 3 and a small recess 12 in an inner side of the housing 1. The ink holder 3 has its upper end fitting in the fit member 4, and a ball point lower end to be moved out of the housing 1 for writing."
+        },
+        {
+          "id": "description-28",
+          "text": "The fit member 4 has an elastic U-shaped portion 41, and a stud 42 is provided on an outer side of the elastic U-shaped portion 41 to engage or disengage from a fit hole 121 provided in the lower portion of the housing 1. Further, the fit member 4 has a guide portion 43 respectively on an upper surface and a lower surface to fit and move in two opposite guide grooves 13 provided inside the lower portion of the housing 1."
+        },
+        {
+          "id": "description-29",
+          "text": "The operative member 5 is movably combined in and on the wall of the housing 1, having a push member 51 extending out of the wall of the housing 1, a rack 52 formed in an inner side, an elongate member 53 formed to extend to the right side from the rack 52 and to protrude through the securing member 2, contacting and able to push the fit member 4 and the ink holder 3 together, and a press member 54 formed at one end for contacting an end of a coil spring 55 located in a compartment 14 formed on an outer surface of the housing 1."
+        },
+        {
+          "id": "description-30",
+          "text": "The gear set 6 includes a main gear 61, a subordinate gear 62, a transmitting gear 63, and a power gear 64, which are all pivotally contained in the upper portion of the housing 1."
+        },
+        {
+          "id": "description-31",
+          "text": "The main gear 61 consists of a pinion 611 and a large gear 612 respectively at two, an upper and a lower sides, with the pinion 611 engaging the rack 52 of the operative member 5."
+        },
+        {
+          "id": "description-32",
+          "text": "The subordinate gear 62 consists of a pinion 621 and an eccentric gear 622 respectively at two, an upper and a lower, sides. The pinion 621 engages the large gear 612 of the main gear 61, and the eccentric gear 622 rotates to snap the elastic strip 21 of the securing member 2 to give out sounds."
+        },
+        {
+          "id": "description-33",
+          "text": "The transmitting gear 63 consists of a pinion 631 and a large gear 632 respectively at two sides. The pinion 631 engages the large gear 612 of the main gear 61."
+        },
+        {
+          "id": "description-34",
+          "text": "The power gear 64 consists of a pinion 641 and a weight 642 respectively at two sides. The pinion 641 engages the large gear 632 of the transmitting gear 63 and the weight 642 supplying an inertia force to the power gear 64 to help the subordinate gear to rotate with stronger inertia force to snap the elastic strip 21 for a longer period of time than otherwise."
+        },
+        {
+          "id": "description-35",
+          "text": "The decorative head 7 is combined with an upper end of the housing 1, having a post portion 71 and a plate portion 72 formed under the post portion 71, with the post portion 71 engaging a hole 17 in an upper end surface of the housing 1."
+        },
+        {
+          "id": "description-36",
+          "text": "Referring to FIGS. 1 and 5, the pinion 611 of the main gear 61 has ratchet teeth 613 formed on its periphery and the large gear 612 has a recess 614 and a plurality of ratchet teeth 615, and the ratchet teeth 613 will engage the ratchet teeth 615 when the pinion is rotated clockwise, and subsequently the pinion 611 rotates the large gear 612. On the contrary, if the pinion 611 is rotated counterclockwise, as shown in FIG. 6, the ratchet teeth 613 cannot engage the ratchet teeth 615 so that the large gear rotates only clockwise."
+        },
+        {
+          "id": "description-37",
+          "text": "Now, referring to FIGS. 1, 3, 4 and 7, in use, the push portion 51 of the operative member 5 is pushed down, forcing the press portion 54 to compress the coil spring 55 and compel the elongate portion 53 to move down to press and move down the fit block 4. Then the fit block 4 slides down, guided by the guiding portion 43 and the guide grooves 13, forcing the stud 42 to engage the hole 121, keeping a lower end (a ball point) of the ink holder 3 protruding out of the housing 1. Further, the downward movement of the operative member 5 also forces the rack 52 to rotate the main gear 61, which then in order rotates the subordinate gear 62, the transmitting gear 63 and the power gear 64. So the eccentric gear 622 rotates to snap intermittently the elastic strip 21 to produce intermittent and light-and-heavy sounds. As the power gear 64 has a weight 642, it will rotate with strong inertia force once it begins to rotate, further helping to rotate the transmitting gear 63, the main gear 61 and the subordinate gear 62 to continue rotating for a longer period than otherwise to snap the elastic strip 21 by the eccentric gear 622 for sounding."
+        },
+        {
+          "id": "description-38",
+          "text": "Further, the engaging structure of the pinion 611 and the large gear 612 can let the pinion 611 rotate clockwise by the rack 52 whenever the operating member 5 is pressed down, and the ratchet teeth 613 engage the ratchet 615, enabling the large gear 612 to rotate the subordinate gear 62 and the transmitting gear 63. Next, referring to FIGS. 2 and 9, if the operating member 5 is released, it will be moved and lifted up by the coil spring 31 so far compressed recovering its resiliency. Then the rack 52 rotates the pinion 611 conterclockwise, unable to engage the ratchet teeth 615 so that the large large gear 612 rotates only clockwise. In addition, the large gear 612 also receives large inertia force from the power gear 64 and the transmitting gear 63 to enable the subordinate gear 62 to rotate longer than otherwise. Thus, if the operating member 5 is pressed repeatedly, the elastic strip 21 is continued to be snapped to give out sounds."
+        },
+        {
+          "id": "description-39",
+          "text": "If the pen is not used for writing, as shown in FIGS. 3 and 8, the stud 42 is pressed to disengage from the hole 121 to shrink inside the housing 1, with the coil spring 31 elastically pushing back the ink holder 3 in the housing 1."
+        },
+        {
+          "id": "description-40",
+          "text": "When the elastic plate 21 gives out sounds not satisfactory, a user can take off the cap 16 and adjust with a tool the elastic plate 21 in its curvature and angle. Thus sounding time and quality of the elastic plate 21 can be altered."
+        },
+        {
+          "id": "description-41",
+          "text": "As can be understood from the aforesaid description, the pen in the invention has the following advantages."
+        },
+        {
+          "id": "description-42",
+          "text": "1. It can be used for writing, and at the same time for giving out sounds to attract curiosity of a user."
+        },
+        {
+          "id": "description-43",
+          "text": "2. Sounding function can attract children's curiosity in writing."
+        },
+        {
+          "id": "description-44",
+          "text": "3. The decorative head may be shaped as a dolphin, a crow, a dog, etc, and the sounds given out by the elastic plate 21 may be thought to be those of the animal the head represents."
+        },
+        {
+          "id": "description-45",
+          "text": "4. The sounds given out by the elastic strip 21 may be altered by adjusting it."
+        },
+        {
+          "id": "description-46",
+          "text": "While the preferred embodiment of the invention has been described above, it will be recognized and understood that various modifications may be made therein and the appended claims are intended to cover all such modifications which may fall within the spirit and scope of the invention."
+        }
+      ],
+      "filing_date": "1998-04-08",
+      "priority_date": "1998-04-08",
+      "source_kind": "google_patents_page",
+      "retrieved_at": "2026-10-19T14:06:28.184651+00:00",
+      "complete": true,
+      "error": "",
+      "snapshot_hash": "40d790b6fc1d8f224d14fcae3bcc7ab6ab66f43dedf690a1fab8d3cca9a225de"
+    }
+  ],
+  "reviews": [
+    {
+      "document_id": "US4968168A",
+      "rows": [
+        {
+          "feature_id": "F1",
+          "status": "disclosed",
+          "section_id": "claim-2",
+          "quote": "an outer barrel having a cylindrical connecting first end and a conical tip second end;",
+          "scheme_id": "S1",
+          "basis": "同义词：outer barrel = outer tube；cylindrical connecting first end = first end；conical tip second end = second conical end。"
+        },
+        {
+          "feature_id": "F2",
+          "status": "disclosed",
+          "section_id": "claim-2",
+          "quote": "an inner tubular ink reservoir having a ball point extendable outside the second conical tip end of the outer barrel extending through the annular connector, through the biasing means; through the fixed annular engaging member, through the rotatable annular engaging member, through the rotatable hollow rod and fixed into the cap; whereby rotating the cap of the hollow rotatable rod in one direction moves the hollow rod and the rotatable engaging member to its inner limit against the biasing means of the fixed engaging member and rotating the cap in the opposite direction moves the rotatable engaging member and the hollow rod to its limit in the same direction as the force of the biasing means, the engaging means making a clicking sound as they engage and disengage and as they reach either limit of rotation and hence axial movement of the hollow rod and the rotating engagement means.",
+          "scheme_id": "S1",
+          "basis": "同义词：ink reservoir tube = inner tubular ink reservoir；ballpoint = ball point；cap = cap；axially moved = axial movement；extending or retracting = extendable outside / retract。"
+        },
+        {
+          "feature_id": "F3",
+          "status": "disclosed",
+          "section_id": "claim-6",
+          "quote": "the hollow rod is externally threaded to fit into the tapped hole at the cap end of the intermediate tube so that inward axial motion of the hollow rod is stopped at its limit by the cap and outward axial motion of the hollow rod is stopped at its limit by the rotatable engaging member against the cap end of the intermediate tube.",
+          "scheme_id": "S1",
+          "basis": "同义词：externally threaded hollow rod = hollow rod externally threaded；tapped hole = tapped hole；intermediate tube = intermediate tube；limited axial movement = stopped at its limit。"
+        },
+        {
+          "feature_id": "F4",
+          "status": "disclosed",
+          "section_id": "claim-2",
+          "quote": "biasing means inside the non-rotatable sleeve adapted to seat into at one end the biasing seating means of the annular connector;",
+          "scheme_id": "S1",
+          "basis": "同义词：compression spring = biasing means；non-rotatable annular engaging member = fixed engaging member；rotatable annular engaging member = rotatable engaging member；biased into contact = biased into the rotatable engaging member。"
+        },
+        {
+          "feature_id": "F5",
+          "status": "disclosed",
+          "section_id": "claim-3",
+          "quote": "wherein the engaging members have annular crowns of teeth.",
+          "scheme_id": "S1",
+          "basis": "同义词：annular crowns of teeth = annular crowns of teeth；fixed and rotatable engaging members = engaging members。"
+        },
+        {
+          "feature_id": "F6",
+          "status": "not_found",
+          "section_id": "claim-4",
+          "quote": "wherein the annular crowns of teeth of the fixed and rotatable, engaging members are of metal whereby upon engaging and disengaging an audible clicking sound is made.",
+          "scheme_id": "S1",
+          "basis": "文献明确限定齿冠为金属，未公开POM聚合物替代金属。"
+        }
+      ],
+      "reviewed": false,
+      "same_scheme_confirmed": false,
+      "enabling_disclosure_confirmed": false
+    },
+    {
+      "document_id": "US5944436A",
+      "rows": [
+        {
+          "feature_id": "F1",
+          "status": "not_found",
+          "section_id": "claim-2",
+          "quote": "a housing, an ink holder, a fit member, a gear set, and an operative member as components combined together;",
+          "scheme_id": "",
+          "basis": "文献仅公开housing，未公开外筒具有圆柱连接端和锥形尖端。"
+        },
+        {
+          "feature_id": "F2",
+          "status": "not_found",
+          "section_id": "claim-2",
+          "quote": "said operative member is pressed down to project said ball point so that a tip is disposed outside of said housing and to rotate said main gear which then rotates said subordinate gear to let said eccentric gear rotate to snap said elastic strip, which then gives out sounds.",
+          "scheme_id": "",
+          "basis": "文献通过按压操作件而非旋转笔帽使笔尖伸出/缩回，未公开旋转笔帽驱动墨水管轴向移动。"
+        },
+        {
+          "feature_id": "F3",
+          "status": "not_found",
+          "section_id": "claim-2",
+          "quote": "said operative member having a push portion located on an outer surface of said housing, a rack on an inner side, an elongate member extending toward the lower portion of the housing from said rack and contacting and able to push said fit member downward,",
+          "scheme_id": "",
+          "basis": "文献使用齿条-齿轮机构，未公开外螺纹空心杆与中间管螺纹孔啮合。"
+        },
+        {
+          "feature_id": "F4",
+          "status": "not_found",
+          "section_id": "claim-2",
+          "quote": "surrounded by a coil spring, said coil spring having one end hooking a projection on said ink holder and the other end hooking a groove of said housing,",
+          "scheme_id": "",
+          "basis": "文献的弹簧用于复位墨水管，未公开偏压不可旋转环形啮合件与可旋转环形啮合件接触。"
+        },
+        {
+          "feature_id": "F5",
+          "status": "not_found",
+          "section_id": "claim-2",
+          "quote": "said gear set contained in an upper portion of said housing, consisting of a main gear, a subordinate gear, said main gear consisting of a pinion engaging said rack of said operative member and a large gear, said subordinate gear consisting of a pinion engaging said large gear of said main gear and an eccentric gear engaging said elastic strip;",
+          "scheme_id": "",
+          "basis": "文献使用齿轮组和弹性条发声，未公开固定和可旋转啮合件的环形齿冠。"
+        },
+        {
+          "feature_id": "F6",
+          "status": "not_found",
+          "section_id": "claim-2",
+          "quote": "said subordinate gear consisting of a pinion engaging said large gear of said main gear and an eccentric gear engaging said elastic strip;",
+          "scheme_id": "",
+          "basis": "文献未公开环形齿冠由POM聚合物制成，也未公开金属替代及可听咔嗒声。"
+        }
+      ],
+      "reviewed": false,
+      "same_scheme_confirmed": false,
+      "enabling_disclosure_confirmed": false
+    }
+  ],
+  "decision": {
+    "label": "insufficient_evidence",
+    "reasons": [
+      "存在资料、日期、检索、要素或复核缺口，不能排除新颖性风险。"
+    ],
+    "document_ids": [],
+    "warnings": [
+      "US4968168A：对照尚未人工复核。",
+      "US5944436A：对照尚未人工复核。"
+    ]
+  },
+  "trace": [
+    "prepare",
+    "retrieve",
+    "locate_evidence",
+    "decide"
+  ],
+  "synonym_groups": [
+    [
+      "压力传感器",
+      "压力感测器",
+      "pressure sensor",
+      "pressure transducer"
+    ],
+    [
+      "温度传感器",
+      "温度感测器",
+      "temperature sensor"
+    ],
+    [
+      "控制器",
+      "控制单元",
+      "controller",
+      "control unit"
+    ],
+    [
+      "无线通信模块",
+      "无线通讯模块",
+      "wireless communication module",
+      "wireless communications module"
+    ],
+    [
+      "电动机",
+      "电机",
+      "electric motor"
+    ],
+    [
+      "红外发射器",
+      "红外发射单元",
+      "infrared emitter"
+    ],
+    [
+      "连接",
+      "相连",
+      "connected to",
+      "coupled to"
+    ],
+    [
+      "串联",
+      "in series"
+    ],
+    [
+      "并联",
+      "in parallel"
+    ]
+  ],
+  "limits": [
+    "未发现完整披露不等于可以授权。",
+    "同义词匹配不证明技术披露或法律等同。",
+    "Google Patents 不包含全部非专利现有技术；日期、抵触申请、充分公开等须人工核验。"
+  ],
+  "model_status": "success"
+}

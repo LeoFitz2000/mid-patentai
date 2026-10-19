@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "description": "人工维护的检索同义词，不是法律等同表；未知词交给人工确认。",
+  "groups": [
+    ["压力传感器", "压力感测器", "pressure sensor", "pressure transducer"],
+    ["温度传感器", "温度感测器", "temperature sensor"],
+    ["控制器", "控制单元", "controller", "control unit"],
+    ["无线通信模块", "无线通讯模块", "wireless communication module", "wireless communications module"],
+    ["电动机", "电机", "electric motor"],
+    ["红外发射器", "红外发射单元", "infrared emitter"],
+    ["连接", "相连", "connected to", "coupled to"],
+    ["串联", "in series"],
+    ["并联", "in parallel"]
+  ]
+}

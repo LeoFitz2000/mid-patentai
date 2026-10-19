@@ -1,0 +1,2 @@
+# 兼容安装入口；全部必需依赖统一维护于 requirements.txt。
+-r requirements.txt

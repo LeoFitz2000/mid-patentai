@@ -1,0 +1,385 @@
+{
+  "dataset_version": "1.0",
+  "provenance": "synthetic_teaching_cases_not_real_patent_gold",
+  "created_at": "2026-10-19T14:40:42.269092+00:00",
+  "versions": {
+    "langgraph": "1.2.16",
+    "llama-index-core": "0.14.25",
+    "deepeval": "4.3.1"
+  },
+  "all_passed": true,
+  "summary": {
+    "langgraph": {
+      "passed": 20,
+      "total": 20
+    },
+    "llamaindex": {
+      "passed": 10,
+      "total": 10
+    },
+    "deepeval": {
+      "passed": 4,
+      "total": 4
+    }
+  },
+  "cases": [
+    {
+      "skill": "langgraph",
+      "id": "single_document_all_features",
+      "passed": true,
+      "expected": "potential_novelty_risk",
+      "actual": "potential_novelty_risk",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "reviewed_chinese_synonym_same_result",
+      "passed": true,
+      "expected": "potential_novelty_risk",
+      "actual": "potential_novelty_risk",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "reviewed_english_synonym_same_result",
+      "passed": true,
+      "expected": "potential_novelty_risk",
+      "actual": "potential_novelty_risk",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "do_not_combine_documents",
+      "passed": true,
+      "expected": "no_complete_disclosure_found",
+      "actual": "no_complete_disclosure_found",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "unknown_is_not_absent",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "unreviewed_model_is_not_gold",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "mutually_exclusive_schemes",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "later_publication_is_not_prior_art",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "same_day_not_automatically_prior",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "cn_conflicting_application_review",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "missing_publication_date",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "snippet_not_full_document",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "fabricated_quote_rejected",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "empty_search_not_safe",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "search_failure_not_safe",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "negation_needs_review",
+      "passed": true,
+      "expected": "insufficient_evidence",
+      "actual": "insufficient_evidence",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "new_extra_feature_not_ignored",
+      "passed": true,
+      "expected": "no_complete_disclosure_found",
+      "actual": "no_complete_disclosure_found",
+      "trace": [
+        "prepare",
+        "retrieve",
+        "locate_evidence",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "legacy_fto_missing_feature",
+      "passed": true,
+      "expected": "out_of_scope",
+      "actual": "out_of_scope",
+      "trace": [
+        "prepare",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "legacy_fto_unknown_feature",
+      "passed": true,
+      "expected": "out_of_scope",
+      "actual": "out_of_scope",
+      "trace": [
+        "prepare",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "langgraph",
+      "id": "legacy_fto_added_feature",
+      "passed": true,
+      "expected": "out_of_scope",
+      "actual": "out_of_scope",
+      "trace": [
+        "prepare",
+        "decide"
+      ],
+      "reason": "标签匹配=True；引用要求=True；风险依据=True"
+    },
+    {
+      "skill": "llamaindex",
+      "id": "chinese_synonym",
+      "passed": true,
+      "actual": "TARGET"
+    },
+    {
+      "skill": "llamaindex",
+      "id": "english_synonym",
+      "passed": true,
+      "actual": "TARGET"
+    },
+    {
+      "skill": "llamaindex",
+      "id": "english_case_and_spacing",
+      "passed": true,
+      "actual": "TARGET"
+    },
+    {
+      "skill": "llamaindex",
+      "id": "controller_alias",
+      "passed": true,
+      "actual": "TARGET"
+    },
+    {
+      "skill": "llamaindex",
+      "id": "relation_alias",
+      "passed": true,
+      "actual": "TARGET"
+    },
+    {
+      "skill": "llamaindex",
+      "id": "word_order_retrieval",
+      "passed": true,
+      "actual": "TARGET"
+    },
+    {
+      "skill": "llamaindex",
+      "id": "keep_negation",
+      "passed": true
+    },
+    {
+      "skill": "llamaindex",
+      "id": "keep_numeric_limit",
+      "passed": true
+    },
+    {
+      "skill": "llamaindex",
+      "id": "keep_connection_relation",
+      "passed": true
+    },
+    {
+      "skill": "llamaindex",
+      "id": "avoid_broad_equivalence",
+      "passed": true
+    },
+    {
+      "skill": "deepeval",
+      "id": "judge_accepts_correct",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "skill": "deepeval",
+      "id": "judge_rejects_wrong",
+      "passed": true,
+      "score": 0.0
+    },
+    {
+      "skill": "deepeval",
+      "id": "judge_requires_risk_citation",
+      "passed": true,
+      "score": 0.0
+    },
+    {
+      "skill": "deepeval",
+      "id": "judge_rejects_invalid_json",
+      "passed": true,
+      "score": 0.0
+    }
+  ],
+  "limitations": [
+    "合成回归案例，不是实际专利准确率。",
+    "同义词词表有限，未知术语需补充复核。"
+  ]
+}
