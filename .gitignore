@@ -24,3 +24,4 @@ id_ed25519
 # Local cases, isolated dependencies and test runs
 /.local/
 /tests/.artifacts/
+/_历史快照/
