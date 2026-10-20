@@ -24,7 +24,8 @@ class EvidenceReviewTests(unittest.TestCase):
         review = DocumentReview(document.id, (row,), True, True, True,
                                 reviewer="test-fixture-not-a-real-reviewer",
                                 same_scheme_basis="教学夹具：该部件属于同一段描述的装置",
-                                scheme_section_ids=("manual-1",))
+                                scheme_section_ids=("manual-1",), relevance="related",
+                                relevance_basis="教学夹具：同一压力传感装置", relevance_section_ids=("manual-1",))
         return features, document, stamp_review(review, features, document, "2024-01-01")
 
     def decide(self, features, document, review, cutoff="2024-01-01"):

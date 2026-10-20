@@ -4,7 +4,7 @@
 
 当前开发版本：**0.2.0**（材料可靠性与证据复核，见 [VERSION](VERSION)）。[版本记录](CHANGELOG.md) · [版本与提交约定](CONTRIBUTING.md)。
 
-保存新材料保留当前工作内容；显式切换前另存草稿。AI 整理结果按轮留存，文字附件引文可机械回查；材料未知项和未校验出处进入判断限制。新快照记录原文编号和锚点，候选与最终复核分开；实际提交记录自填复核人、时间和输入绑定。见[证据定位与复核说明](docs/evidence-review.md)。检索构造改造尚未实施。
+保存新材料保留当前工作内容；显式切换前另存草稿。AI 整理结果按轮留存，文字附件引文可机械回查；材料未知项和未校验出处进入判断限制。新快照记录原文编号和锚点，候选与最终复核分开；实际提交记录自填复核人、时间和输入绑定。见[证据定位与复核说明](docs/evidence-review.md)。第三阶段增加[逐要素检索记录与相关性关卡](docs/search-evidence.md)，保留实际查询和失败，超长查询明确拒绝。
 
 把一个发明想法整理成技术要素，从 **Google Patents** 获取文献，逐篇生成可回查原文的要素对照，再依据 **CNIPA 新颖性规则**给出有范围限制的预筛结果。
 
@@ -15,7 +15,7 @@
 | 判断目标 | 中国发明/实用新型场景的新颖性预筛 |
 | 资料来源 | 本次从 Google Patents 取得或人工录入的原文段落快照 |
 | 比对单位 | 用户确认的整套技术要素；暂不区分独立/从属权利要求，不展开从属引用 |
-| 人工复核 | 核对技术含义、引文、完整性、同一技术方案和充分公开 |
+| 人工复核 | 核对技术相关性及原文依据、技术含义、引文、完整性、同一技术方案和充分公开 |
 | 交付 | 新颖性 Markdown 报告、证据与判断 JSON、独立的基础 eval 记录 |
 
 ## 完整工作技术流程图
@@ -34,8 +34,8 @@ flowchart TD
     end
 
     subgraph SOURCE["二、文献获取 · LangGraph retrieve"]
-        PLAN["原词与中英同义词查询扩展<br/>最多 4 个查询，按文献数上限停止"]
-        GP["Google Patents 公开检索<br/>校验来源，按公开号去重"]
+        PLAN["先逐要素原词，再补同义词<br/>最多8条查询，每条最多400字；超限明确记录"]
+        GP["Google Patents 公开检索<br/>保留各查询最多5条返回；按公开号去重，词汇排序后按正文预算读取"]
         FETCH["获取单篇页面<br/>提取日期、摘要、平铺权利要求和说明书段落"]
         GAP["保留空结果、获取失败或正文缺失记录<br/>不能解释为没有现有技术"]
         MANUAL["人工录入同一 Google Patents 页面的原文<br/>保留链接、日期、段落和人工来源标记"]
@@ -63,7 +63,7 @@ flowchart TD
         LLM["LLMClient 调用兼容 Chat Completions 的模型<br/>发送载荷超过 5 万字符时拒绝，不静默截断"]
         CHECK{"JSON、要素编号和已披露引文校验通过？"}
         REJECT["拒绝本次模型对照，显示错误<br/>保留已有候选供人工处理"]
-        HUMAN["逐项编辑 disclosed / not_found / unknown<br/>核对逐字引文、段落位置和技术方案编号<br/>确认完整性、同一方案、技术含义与充分公开"]
+        HUMAN["记录技术相关性、说明与原文位置<br/>逐项编辑 disclosed / not_found / unknown，核对引文和方案编号<br/>确认完整性、同一方案、技术含义与充分公开"]
         CAND --> CHOICE
         CHOICE -->|否| HUMAN
         CHOICE -->|是| CONSENT --> LLM --> CHECK
@@ -73,7 +73,7 @@ flowchart TD
 
     subgraph DECISION["五、新颖性预筛 · LangGraph decide / novelty_rules.py"]
         RERUN["提交人工复核结果，使用已有快照重跑状态图<br/>不重新联网检索"]
-        RULE["逐篇检查来源、日期、资料完整性和要素覆盖<br/>引文须回查；不跨文献或互斥方案拼接"]
+        RULE["逐篇检查来源、日期、相关性、完整性和要素覆盖<br/>保留检索缺口；引文须回查，不跨文献或互斥方案拼接"]
         RESULT{"逐篇评估结果"}
         RISK["potential_novelty_risk<br/>至少一篇基准日前文献，经复核在同一方案中完整披露"]
         NOTFOUND["no_complete_disclosure_found<br/>本次全部文献已完整复核且无缺口<br/>未发现单篇完整披露"]
@@ -86,7 +86,7 @@ flowchart TD
     end
 
     subgraph DELIVERY["六、结果交付与状态更新"]
-        REPORT["导出 Markdown 报告与证据 JSON<br/>要素、来源快照及哈希、同义词表、复核记录、执行轨迹"]
+        REPORT["导出 Markdown 报告与证据 JSON<br/>实际查询与候选、失败、来源快照及哈希、术语表、复核记录"]
         RISK --> REPORT
         NOTFOUND --> REPORT
         UNKNOWN --> REPORT
@@ -141,7 +141,7 @@ py -m venv .venv-novelty
 
 1. **确认判断对象。**填写发明描述、基准日与技术要素，每行一个，保留连接关系、步骤、否定和数值。涉及优先权时，先人工确定适用基准日。
 2. **取得文献。**点击第 1 步检索 Google Patents，或直接粘贴同一来源的原文。人工录入需填写链接、日期，并保留相关权利要求和说明书上下文。
-3. **核对候选证据。**查看原文、段落编号、匹配提示和出处；低匹配分数不能证明某个特征不存在。
+3. **核对候选证据。**查看实际查询、未查询要素、候选和正文获取状态，再查看原文、段落编号与出处。确认技术相关性时保留说明和原文位置；高低词汇分数均不能证明相关性或特征披露。
 4. **按需使用模型建议。**选择文献并确认外发内容后调用模型；建议通过引文校验后仍需人工复核。也可以直接手工完成对照。
 5. **提交复核并预筛。**逐项编辑披露状态、逐字引文、原文位置和方案编号。只有确认为同一技术方案的段落才能使用统一方案编号，不能合并互斥实施例。
 6. **导出记录。**下载 Markdown 与 JSON。改变输入或原文需重建对照；改变已复核表格或确认状态后，需重新预筛才能导出更新结果。
@@ -178,6 +178,7 @@ FTO、侵权等其他任务返回 `out_of_scope`，不进入在线检索。
 |---|---|
 | [app.py](app.py)、[novelty_ui.py](modules/novelty_ui.py) | 应用入口、会话状态、模型外发确认、人工对照和报告下载 |
 | [patent_search.py](modules/patent_search.py)、[google_patent_documents.py](modules/google_patent_documents.py) | Google Patents 候选检索、正文解析和人工快照入口 |
+| [novelty_search.py](modules/novelty_search.py) | 逐要素查询计划、实际执行记录、候选词汇排序及检索缺口 |
 | [novelty_models.py](modules/novelty_models.py) | 技术要素、原文段落、快照、对照及结果的数据契约 |
 | [novelty_matching.py](modules/novelty_matching.py)、[synonyms.json](config/synonyms.json) | 中英同义词规范化、查询扩展和候选匹配提示 |
 | [novelty_rules.py](modules/novelty_rules.py) | 来源、时间、引文及逐篇要素覆盖规则 |

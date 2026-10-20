@@ -20,6 +20,8 @@ def report_payload(state: dict, invention: str, cutoff: str, lexicon_groups: lis
         "decision": asdict(state["decision"]), "trace": state["trace"], "synonym_groups": lexicon_groups,
         "material_unknowns": state.get("material_unknowns", []),
         "material_warnings": state.get("material_warnings", []),
+        "search_audit": state.get("search_audit", {"mode": "not_recorded", "queries": [],
+            "scope_note": "历史记录未保存实际查询，不能推定执行过在线检索。"}),
         "limits": ["未发现完整披露不等于可以授权。", "同义词匹配不证明技术披露或法律等同。",
                    "Google Patents 不包含全部非专利现有技术；日期、抵触申请、充分公开等须人工核验。"],
     }
@@ -32,6 +34,34 @@ def to_markdown(payload: dict) -> str:
              f"判断基准日：{payload['cutoff']}", f"范围：{payload['scope']}",
              "", "## 发明描述", payload["invention"], "", "## 已确认技术要素"]
     lines += [f"- {f['id']}：{f['text']}" for f in payload["features"]]
+    audit = payload.get("search_audit", {"mode": "not_recorded"})
+    lines += ["", "## 检索范围与实际记录"]
+    if audit["mode"] != "online":
+        lines += [audit.get("scope_note", "仅比对提供的快照；历史实际查询未记录。")]
+    else:
+        lines += [f"模式：{audit.get('query_mode')}；查询预算：{audit['query_budget']}；每条最多保留{audit['results_per_query']}条返回记录；"
+                  f"正文获取预算：{audit['document_budget']}",
+                  f"开始：{audit['started_at']}；结束：{audit['finished_at']}",
+                  "要素编号表示该要素的查询已发送，不证明该查询足以覆盖所有技术表达。词汇重合分数仅用于排序，不代表相关性。"]
+        for record in audit["queries"]:
+            lines += [f"- {record['id']} · 要素={', '.join(record['feature_ids']) or '自定义范围未确认'}；{record['kind']}；"
+                      f"{record['status']}；{record['started_at']} → {record['finished_at']}；返回{record['returned_count']}条",
+                      f"  实际查询：{record['query']}"]
+            if record["error"]:
+                lines += [f"  错误：{record['error']}"]
+            for result in record["results"]:
+                lines += [f"  候选：{result.get('publication_id', '未通过来源校验')} · {result.get('title', '')} · "
+                          f"{result.get('url', '')}；{result.get('validation_error', '')}"]
+        for skipped in audit.get("skipped", []):
+            lines += [f"- 未发送 · {', '.join(skipped['feature_ids']) or '自定义变体'}：{skipped['reason']}；查询原文：{skipped['query']}"]
+        for candidate in audit["candidates"]:
+            lines += [f"- 正文获取 · {candidate['publication_id']}：{candidate['fetch_status']}；{candidate['fetch_error']}；"
+                      f"来自{', '.join(candidate['query_ids'])}；词汇排序提示={candidate['lexical_hint']['score']}"]
+        fetched_ids = {c["publication_id"] for c in audit["candidates"] if c["fetch_status"] == "fetched"}
+        supplied_ids = [doc["id"] for doc in payload["documents"] if doc["id"] not in fetched_ids
+                        or doc["source_kind"] == "manual_google_patents_snapshot"]
+        if supplied_ids:
+            lines += ["另行提供的快照（不冒充在线获取）：" + "、".join(supplied_ids)]
     lines += ["", "## 判断依据"] + [f"- {reason}" for reason in payload["decision"]["reasons"]]
     lines += ["", "## 缺口与待核验事项"] + [f"- {warning}" for warning in payload["decision"]["warnings"]]
     reviews = {item["document_id"]: item for item in payload["reviews"]}
@@ -52,7 +82,9 @@ def to_markdown(payload: dict) -> str:
                       f"复核人（自填）：{review.get('reviewer') or '未记录'}；提交时间：{review.get('reviewed_at') or '未记录'}",
                       f"复核输入绑定：`{review.get('input_hash') or '历史记录未绑定，须重新复核'}`",
                       f"同一方案说明：{review.get('same_scheme_basis') or '未提供'}；"
-                      f"依据位置：{', '.join(review.get('scheme_section_ids', [])) or '未提供'}"]
+                      f"依据位置：{', '.join(review.get('scheme_section_ids', [])) or '未提供'}",
+                      f"技术相关性：{review.get('relevance', 'unknown')}；依据：{review.get('relevance_basis') or '未提供'}；"
+                      f"原文位置：{', '.join(review.get('relevance_section_ids', [])) or '未提供'}"]
             for row in review["rows"]:
                 section = sections.get(row['section_id'], {})
                 location = section.get('source_location') or f"旧版快照内部编号 {row['section_id']}（非原文权利要求号）"

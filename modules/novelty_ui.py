@@ -72,6 +72,7 @@ def main() -> None:
                                 placeholder="压力传感器\n压力传感器连接控制器\n控制器通过无线通信模块发送数据")
     cutoff = st.date_input("判断基准日", value=datetime.now(ZoneInfo("Asia/Shanghai")).date()).isoformat()
     query = st.text_input("Google Patents 检索词（可选）")
+    st.caption("留空时逐要素查询，再补充同义词；最多8条，每条最多400字，不截断。自定义检索词覆盖范围另行记录。")
     st.caption("先按整套要素评估，不区分独立/从属权利要求。基准日及优先权适用性由你确认。")
     st.info("检索会把检索词发送到 Google Patents。只有另行确认后，选定要素和原文才会发送到模型。")
     prepared = st.session_state.get("prepared_material_features")
@@ -113,7 +114,9 @@ def main() -> None:
                                                   manual_filing, manual_priority, manual_complete)
                 documents = [doc for doc in (state or {}).get("documents", []) if doc.id != document.id] + [document]
                 state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff, documents=documents,
-                                    errors=(state or {}).get("errors", []), **material_context)
+                                    errors=(state or {}).get("errors", []),
+                                    **({"search_audit": state["search_audit"]} if state and "search_audit" in state else {}),
+                                    **material_context)
                 st.session_state["novelty_state"] = state
                 st.session_state["novelty_signature"] = signature
                 st.session_state["review_epoch"] = st.session_state.get("review_epoch", 0) + 1
@@ -125,6 +128,22 @@ def main() -> None:
 
     st.divider()
     st.subheader("2 · 查看原文与候选对照")
+    audit = state["search_audit"]
+    with st.expander("本轮检索范围与记录"):
+        if audit["mode"] == "provided_snapshots":
+            st.write("仅比对提供的快照；本轮未执行在线检索，不能推断检索覆盖。")
+        else:
+            st.write("在线检索记录：所有计划内查询先执行，再按独立文献预算读取正文。词汇分数仅用于排序，相关性另行复核。")
+            st.dataframe([{"查询": r["id"], "要素": ", ".join(r["feature_ids"]) or "自定义范围",
+                           "实际检索词": r["query"], "状态": r["status"], "返回数": r["returned_count"],
+                           "开始": r["started_at"], "结束": r["finished_at"], "错误": r["error"]}
+                          for r in audit["queries"]], hide_index=True, width="stretch")
+            for skipped in audit.get("skipped", []):
+                st.warning(f"未发送：{', '.join(skipped['feature_ids']) or '自定义变体'} · {skipped['reason']}")
+            st.dataframe([{"公开号": c["publication_id"], "标题": c["title"], "链接": c["url"],
+                           "来自查询": ", ".join(c["query_ids"]), "词汇重合提示": c["lexical_hint"]["score"],
+                           "正文状态": c["fetch_status"], "获取错误": c["fetch_error"]}
+                          for c in audit["candidates"]], hide_index=True, width="stretch")
     for error in state.get("errors", []):
         st.warning(error)
     for doc in state["documents"]:
@@ -158,6 +177,7 @@ def main() -> None:
                 state["reviews"] = []
                 state["decision"] = harness.run(features=state["features"], cutoff=cutoff,
                                                 documents=state["documents"], errors=state.get("errors", []),
+                                                search_audit=state["search_audit"],
                                                 **material_context)["decision"]
                 st.session_state["review_epoch"] = st.session_state.get("review_epoch", 0) + 1
             except (RuntimeError, ValueError, PermissionError) as exc:
@@ -203,6 +223,13 @@ def main() -> None:
             st.session_state[f"review-{content_key}"] = False
             st.rerun()
         sections_by_id = {section.id: section for section in doc.sections}
+        relevance = st.selectbox(f"技术相关性 · {doc.id}", ["unknown", "related", "unrelated"],
+            format_func=lambda value: {"unknown": "待核实", "related": "相关（说明技术关系）", "unrelated": "不相关（记录排除依据）"}[value],
+            key=f"relevance-{content_key}")
+        relevance_basis = st.text_area(f"相关性或排除依据 · {doc.id}", key=f"relevance-basis-{content_key}")
+        relevance_sections = st.multiselect(f"相关性依据位置 · {doc.id}", list(sections_by_id),
+            format_func=lambda key: f"{key} · {sections_by_id[key].source_location or '快照内部位置'}",
+            key=f"relevance-sections-{content_key}")
         for row in rows:
             if row.status in {"disclosed", "not_found"} and not row.basis.strip():
                 st.warning(f"{row.feature_id}：请填写或更新人工复核说明，旧说明不能自动沿用到新状态。")
@@ -217,7 +244,8 @@ def main() -> None:
             st.caption("解析器发现了权利要求和说明书；这仅是结构提示，不代表相关上下文完整。")
         complete = st.checkbox("确认快照内容完整，已保留相关上下文", value=False, key=f"complete-{content_key}")
         edit_signature = fingerprint(json.dumps([asdict(row) for row in rows], ensure_ascii=False),
-                                     str(complete), reviewer, scheme_basis, json.dumps(scheme_sections))
+                                     str(complete), reviewer, scheme_basis, json.dumps(scheme_sections),
+                                     relevance, relevance_basis, json.dumps(relevance_sections))
         last_edit_key = f"last-review-edit-{content_key}"
         if last_edit_key in st.session_state and st.session_state[last_edit_key] != edit_signature:
             for prefix in ("review", "scheme", "enabling"):
@@ -228,7 +256,9 @@ def main() -> None:
         enabling = st.checkbox("确认相关披露可实施，且同义表述的技术含义和限定一致", key=f"enabling-{content_key}")
         pending_reviews.append(DocumentReview(doc.id, rows, reviewed, same_scheme, enabling,
                                               reviewer=reviewer, same_scheme_basis=scheme_basis,
-                                              scheme_section_ids=tuple(scheme_sections)))
+                                              scheme_section_ids=tuple(scheme_sections), relevance=relevance,
+                                              relevance_basis=relevance_basis,
+                                              relevance_section_ids=tuple(relevance_sections)))
         checked_documents.append(replace(doc, complete=complete))
 
     if st.button("3 · 根据已复核对照进行新颖性预筛"):
@@ -237,7 +267,8 @@ def main() -> None:
             submitted = [stamp_review(review, state["features"], doc, cutoff)
                          for review, doc in zip(pending_reviews, checked_documents)]
             state = harness.run(features=state["features"], cutoff=cutoff, documents=checked_documents,
-                                reviews=submitted, errors=state.get("errors", []), **material_context)
+                                reviews=submitted, errors=state.get("errors", []),
+                                search_audit=state["search_audit"], **material_context)
             state["suggestions"] = candidates
             st.session_state["novelty_state"] = state
         except (RuntimeError, ValueError) as exc:

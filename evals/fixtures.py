@@ -36,7 +36,9 @@ def case_inputs(case: dict, cutoff: str = "2024-01-01") -> dict:
                                 reviewer="synthetic-fixture-not-a-real-reviewer",
                                 reviewed_at="2024-01-01T00:00:00+00:00",
                                 same_scheme_basis="教学夹具给定的方案关系，不代表真实专利判断",
-                                scheme_section_ids=("s1",))
+                                scheme_section_ids=("s1",), relevance="related",
+                                relevance_basis="教学夹具模拟的相关技术范围；不是实际相关性确认",
+                                relevance_section_ids=("s1",))
         reviews.append(replace(review, input_hash=review_input_hash(features, documents[-1], cutoff, review)))
     return {"features": features, "documents": documents, "reviews": reviews,
             "cutoff": cutoff, "task": case.get("task", "novelty"), "errors": case.get("errors", [])}

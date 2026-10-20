@@ -139,21 +139,25 @@ class DocumentReview:
     input_hash: str = ""
     same_scheme_basis: str = ""
     scheme_section_ids: tuple[str, ...] = ()
+    relevance: str = "unknown"  # related / unrelated / unknown; never inferred from lexical score.
+    relevance_basis: str = ""
+    relevance_section_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        for key in ("reviewer", "reviewed_at", "input_hash", "same_scheme_basis"):
+        for key in ("reviewer", "reviewed_at", "input_hash", "same_scheme_basis", "relevance", "relevance_basis"):
             value = getattr(self, key)
             if value is None:
                 object.__setattr__(self, key, "")
             elif not isinstance(value, str):
                 raise ValueError(f"复核记录的 {key} 必须是文本。")
-        if self.scheme_section_ids is None:
-            object.__setattr__(self, "scheme_section_ids", ())
-        elif (not isinstance(self.scheme_section_ids, (tuple, list))
-              or any(not isinstance(value, str) for value in self.scheme_section_ids)):
-            raise ValueError("同一方案的依据位置须为编号列表。")
-        else:
-            object.__setattr__(self, "scheme_section_ids", tuple(self.scheme_section_ids))
+        for key in ("scheme_section_ids", "relevance_section_ids"):
+            value = getattr(self, key)
+            if value is None:
+                object.__setattr__(self, key, ())
+            elif (not isinstance(value, (tuple, list)) or any(not isinstance(x, str) for x in value)):
+                raise ValueError("复核依据位置须为编号列表。")
+            else:
+                object.__setattr__(self, key, tuple(value))
 
 
 def review_content(review: DocumentReview) -> dict:

@@ -10,6 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from streamlit.testing.v1 import AppTest
+from modules.google_patent_documents import manual_google_document
 
 
 def labeled(elements, label):
@@ -91,6 +92,9 @@ class AppFlowTests(unittest.TestCase):
         labeled(app.text_input, "复核人姓名或代号（自行填写）").set_value("test-fixture-not-real-reviewer")
         labeled(app.text_area, "同一技术方案的原文依据 · US123").set_value("教学夹具：单段描述的同一个装置")
         labeled(app.multiselect, "同一方案依据位置 · US123").set_value(["manual-1"])
+        labeled(app.selectbox, "技术相关性 · US123").set_value("related")
+        labeled(app.text_area, "相关性或排除依据 · US123").set_value("教学夹具：同一个压力传感装置")
+        labeled(app.multiselect, "相关性依据位置 · US123").set_value(["manual-1"])
         labeled(app.checkbox, "确认快照内容完整，已保留相关上下文").set_value(True).run(timeout=60)
         for label in ["我已逐项核对披露状态与引文（not_found 仅代表本次文献未找到）",
                       "全部已披露要素属于同一技术方案，并非不同实施例的拼接",
@@ -132,6 +136,42 @@ class AppFlowTests(unittest.TestCase):
         self.assertEqual(adopted.basis, "")
         self.assertEqual(adopted.origin, "auto")
         self.assertEqual(app.session_state["novelty_state"]["decision"].label, "insufficient_evidence")
+
+    def test_online_journal_survives_manual_addition_model_and_review_submission(self):
+        doc = manual_google_document("https://patents.google.com/patent/US123/en", "fixture", "2023-01-01", "压力传感器")
+        response = json.dumps({"reviews": [{"document_id": "US123", "rows": [
+            {"feature_id": "F1", "status": "unknown", "section_id": "manual-1",
+             "quote": "压力传感器", "scheme_id": "", "basis": "fixture"}]}]}, ensure_ascii=False)
+        with patch("skills.langgraph_skill.search_patents", return_value=[{"url": doc.url}]) as search, \
+             patch("skills.langgraph_skill.fetch_google_document", return_value=doc), \
+             patch("modules.llm_client.LLMClient.complete", return_value=response):
+            app = self.app()
+            labeled(app.text_area, "发明描述").set_value("测试装置包含压力传感器。")
+            app.date_input[0].set_value(date(2024, 1, 1))
+            labeled(app.text_area, "确认待判断的技术要素（每行一个）").set_value("压力传感器").run(timeout=60)
+            labeled(app.button, "1 · 检索 Google Patents 并定位证据").click().run(timeout=60)
+            journal = app.session_state["novelty_state"]["search_audit"]
+            calls = search.call_count
+            self.manual_snapshot(app, "压力传感器")
+            self.assertEqual(app.session_state["novelty_state"]["search_audit"], journal)
+            labeled(app.sidebar.text_input, "模型 API Key（可选）").set_value("test-key").run(timeout=60)
+            labeled(app.checkbox, "我确认将上述要素和选定原文发送到此模型服务").set_value(True).run(timeout=60)
+            labeled(app.button, "生成待复核对照").click().run(timeout=60)
+            labeled(app.button, "3 · 根据已复核对照进行新颖性预筛").click().run(timeout=60)
+            self.assertEqual(len(app.exception), 0)
+            self.assertEqual(search.call_count, calls)
+            self.assertEqual(app.session_state["novelty_state"]["search_audit"], journal)
+            self.assertEqual(app.session_state["last_generated_report"]["search_audit"], journal)
+            self.assertEqual(app.session_state["novelty_state"]["reviews"][0].relevance, "unknown")
+
+    def test_relevance_change_invalidates_confirmation_and_export(self):
+        app = self.manual_snapshot(self.app())
+        labeled(app.checkbox, "我已逐项核对披露状态与引文（not_found 仅代表本次文献未找到）").set_value(True).run(timeout=60)
+        labeled(app.button, "3 · 根据已复核对照进行新颖性预筛").click().run(timeout=60)
+        labeled(app.selectbox, "技术相关性 · US123").set_value("unrelated").run(timeout=60)
+        self.assertEqual(len(app.exception), 0)
+        self.assertFalse(labeled(app.checkbox, "我已逐项核对披露状态与引文（not_found 仅代表本次文献未找到）").value)
+        self.assertFalse(any(item.value == "预筛结果" for item in app.subheader))
 
 
 if __name__ == "__main__":

@@ -12,13 +12,15 @@ from modules.novelty_models import (
     DocumentReview, Feature, NoveltyDecision, PatentDocument, check_cutoff, google_patent_url,
     review_input_hash,
 )
+from modules.novelty_search import search_warnings
 
 
 def assess_novelty(features: list[Feature], documents: list[PatentDocument],
                    reviews: list[DocumentReview], cutoff: str, *, task: str = "novelty",
                    errors: list[str] | None = None, allow_synthetic: bool = False,
                    material_unknowns: list[str] | None = None,
-                   material_warnings: list[str] | None = None) -> NoveltyDecision:
+                   material_warnings: list[str] | None = None,
+                   search_audit: dict | None = None) -> NoveltyDecision:
     if task != "novelty":
         return NoveltyDecision("out_of_scope", ["仅支持新颖性预筛，不输出侵权、FTO 或可授权性判断。"])
     baseline = check_cutoff(cutoff)
@@ -27,6 +29,7 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
     if len({d.id for d in documents}) != len(documents):
         raise ValueError("文献编号重复，请先按公开号去重。")
     warnings = list(errors or [])
+    warnings.extend(search_warnings(search_audit, features, cutoff))
     for values, prefix in ((material_unknowns, "材料未知项："), (material_warnings, "材料核查缺口：")):
         if values is not None and (not isinstance(values, list) or any(not isinstance(x, str) for x in values)):
             raise ValueError("材料未知项与核查缺口须为文字列表。")
@@ -86,6 +89,14 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
         if (not review.reviewer.strip() or not time_valid
                 or review.input_hash != review_input_hash(features, doc, cutoff, review)):
             warnings.append(f"{doc.id}：复核人、时刻或输入绑定缺失/已失效，请重新复核。")
+            continue
+        section_ids = {s.id for s in doc.sections}
+        if (review.relevance not in {"related", "unrelated"} or not review.relevance_basis.strip()
+                or not review.relevance_section_ids or not set(review.relevance_section_ids) <= section_ids):
+            warnings.append(f"{doc.id}：技术相关性未确认，或缺少说明及原文位置；词汇分数不能代替相关性。")
+            continue
+        if review.relevance == "unrelated":
+            warnings.append(f"{doc.id}：复核标为不相关，不能据此排除待判断方案的完整披露风险。")
             continue
         by_feature = {row.feature_id: row for row in review.rows}
         if len(by_feature) != len(review.rows) or set(by_feature) != {f.id for f in features}:
