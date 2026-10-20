@@ -20,3 +20,7 @@ _backups/
 *.p12
 id_rsa
 id_ed25519
+
+# Local cases, isolated dependencies and test runs
+/.local/
+/tests/.artifacts/
