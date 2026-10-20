@@ -5,8 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from dataclasses import asdict, dataclass, field
-from datetime import date
+from dataclasses import asdict, dataclass, field, replace
+from datetime import date, datetime, timezone
 from urllib.parse import urlparse
 
 
@@ -52,6 +52,8 @@ def parse_features(text: str) -> list[Feature]:
 class SourceSection:
     id: str
     text: str
+    source_location: str = ""
+    source_anchor: str = ""
 
 
 @dataclass(frozen=True)
@@ -67,15 +69,32 @@ class PatentDocument:
     retrieved_at: str = ""
     complete: bool = False
     error: str = ""
+    snapshot_schema_version: int = 1
+    parsed_complete: bool = False
+
+    def __post_init__(self) -> None:
+        if self.snapshot_schema_version not in {1, 2}:
+            raise ValueError("不支持的快照格式版本。")
+        if self.snapshot_schema_version == 1 and (
+                self.parsed_complete or any(s.source_location or s.source_anchor for s in self.sections)):
+            raise ValueError("原文定位信息须使用第2版快照，不能添加到旧版哈希之外。")
 
     @property
     def snapshot_hash(self) -> str:
         # 日期也是判断输入，所以不仅对正文做哈希。
-        raw = json.dumps(asdict(self), ensure_ascii=False, sort_keys=True)
+        raw = json.dumps(self.to_dict(), ensure_ascii=False, sort_keys=True)
         return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        data = asdict(self)
+        if self.snapshot_schema_version == 1:
+            # Preserve the original canonical representation and hashes exactly.
+            data.pop("snapshot_schema_version")
+            data.pop("parsed_complete")
+            for section in data["sections"]:
+                section.pop("source_location")
+                section.pop("source_anchor")
+        return data
 
     @classmethod
     def from_dict(cls, value: dict) -> "PatentDocument":
@@ -96,10 +115,11 @@ class EvidenceRow:
     quote: str = ""
     scheme_id: str = ""  # 同一文献中同一技术方案；不得拼接互斥实施例。
     basis: str = "unreviewed"
+    origin: str = "unknown"  # auto / model / human; unknown for legacy records.
 
     def __post_init__(self) -> None:
         # 表格清空文本单元格时 Streamlit 可能返回 None，按空证据处理而不是崩溃。
-        for key in ("feature_id", "status", "section_id", "quote", "scheme_id", "basis"):
+        for key in ("feature_id", "status", "section_id", "quote", "scheme_id", "basis", "origin"):
             value = getattr(self, key)
             if value is None:
                 object.__setattr__(self, key, "")
@@ -114,6 +134,54 @@ class DocumentReview:
     reviewed: bool = False
     same_scheme_confirmed: bool = False
     enabling_disclosure_confirmed: bool = False
+    reviewer: str = ""
+    reviewed_at: str = ""
+    input_hash: str = ""
+    same_scheme_basis: str = ""
+    scheme_section_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        for key in ("reviewer", "reviewed_at", "input_hash", "same_scheme_basis"):
+            value = getattr(self, key)
+            if value is None:
+                object.__setattr__(self, key, "")
+            elif not isinstance(value, str):
+                raise ValueError(f"复核记录的 {key} 必须是文本。")
+        if self.scheme_section_ids is None:
+            object.__setattr__(self, "scheme_section_ids", ())
+        elif (not isinstance(self.scheme_section_ids, (tuple, list))
+              or any(not isinstance(value, str) for value in self.scheme_section_ids)):
+            raise ValueError("同一方案的依据位置须为编号列表。")
+        else:
+            object.__setattr__(self, "scheme_section_ids", tuple(self.scheme_section_ids))
+
+
+def review_content(review: DocumentReview) -> dict:
+    """Editable content, excluding the timestamp/hash assigned only on submit."""
+    data = asdict(review)
+    data.pop("reviewed_at")
+    data.pop("input_hash")
+    return data
+
+
+def review_input_hash(features: list[Feature], document: PatentDocument, cutoff: str,
+                      review: DocumentReview) -> str:
+    data = asdict(review)
+    data.pop("input_hash")
+    raw = json.dumps({"features": [asdict(f) for f in features], "cutoff": cutoff,
+                      "snapshot_hash": document.snapshot_hash, "review": data},
+                     ensure_ascii=False, sort_keys=True)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def stamp_review(review: DocumentReview, features: list[Feature],
+                 document: PatentDocument, cutoff: str) -> DocumentReview:
+    """Record an actual submission; callers must not use this for AI suggestions."""
+    if not review.reviewed:
+        return replace(review, reviewed_at="", input_hash="")
+    stamped = replace(review, reviewer=review.reviewer.strip(),
+                      reviewed_at=datetime.now(timezone.utc).isoformat(), input_hash="")
+    return replace(stamped, input_hash=review_input_hash(features, document, cutoff, stamped))
 
 
 @dataclass

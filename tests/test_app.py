@@ -83,15 +83,16 @@ class AppFlowTests(unittest.TestCase):
 
     def test_reviewed_suggestion_produces_report_and_changed_confirmation_invalidates_it(self):
         app = self.manual_snapshot(self.app(), "该装置包括压力传感器。")
-        state = app.session_state["novelty_state"]
-        suggestion = state["suggestions"][0]
-        row = replace(suggestion.rows[0], status="disclosed", quote="压力传感器", scheme_id="scheme1")
-        state["suggestions"] = [replace(suggestion, rows=(row,))]
-        app.session_state["novelty_state"] = state
-        app.session_state["review_epoch"] = 20
+        draft_key = next(key for key in app.session_state if key.startswith("review-draft-"))
+        row = replace(app.session_state[draft_key][0], status="disclosed", section_id="manual-1",
+                      quote="压力传感器", scheme_id="scheme1", basis="教学夹具：本句明确披露该部件")
+        app.session_state[draft_key] = (row,)
         app.run(timeout=60)
-        for label in ["确认快照内容完整，已保留相关上下文",
-                      "我已逐项核对披露状态与引文（not_found 仅代表本次文献未找到）",
+        labeled(app.text_input, "复核人姓名或代号（自行填写）").set_value("test-fixture-not-real-reviewer")
+        labeled(app.text_area, "同一技术方案的原文依据 · US123").set_value("教学夹具：单段描述的同一个装置")
+        labeled(app.multiselect, "同一方案依据位置 · US123").set_value(["manual-1"])
+        labeled(app.checkbox, "确认快照内容完整，已保留相关上下文").set_value(True).run(timeout=60)
+        for label in ["我已逐项核对披露状态与引文（not_found 仅代表本次文献未找到）",
                       "全部已披露要素属于同一技术方案，并非不同实施例的拼接",
                       "确认相关披露可实施，且同义表述的技术含义和限定一致"]:
             labeled(app.checkbox, label).set_value(True)
@@ -99,9 +100,38 @@ class AppFlowTests(unittest.TestCase):
         labeled(app.button, "3 · 根据已复核对照进行新颖性预筛").click().run(timeout=60)
         self.assertEqual(len(app.exception), 0)
         self.assertEqual(app.session_state["novelty_state"]["decision"].label, "potential_novelty_risk")
+        review = app.session_state["novelty_state"]["reviews"][0]
+        self.assertEqual(review.reviewer, "test-fixture-not-real-reviewer")
+        self.assertTrue(review.reviewed_at)
+        self.assertTrue(review.input_hash)
+        self.assertTrue(any(item.value == "预筛结果" for item in app.subheader))
+        app.run(timeout=60)
+        self.assertEqual(app.session_state["novelty_state"]["reviews"][0].reviewed_at, review.reviewed_at)
         self.assertTrue(any(item.value == "预筛结果" for item in app.subheader))
         labeled(app.checkbox, "我已逐项核对披露状态与引文（not_found 仅代表本次文献未找到）").set_value(False).run(timeout=60)
         self.assertFalse(any(item.value == "预筛结果" for item in app.subheader))
+        labeled(app.text_input, "复核人姓名或代号（自行填写）").set_value("another-test-alias").run(timeout=60)
+        self.assertFalse(labeled(app.checkbox, "我已逐项核对披露状态与引文（not_found 仅代表本次文献未找到）").value)
+        self.assertFalse(any(item.value == "预筛结果" for item in app.subheader))
+
+    def test_final_review_starts_empty_and_candidate_adoption_is_explicit(self):
+        app = self.manual_snapshot(self.app(), "该装置包括压力传感器。")
+        draft_key = next(key for key in app.session_state if key.startswith("review-draft-"))
+        draft = app.session_state[draft_key][0]
+        self.assertEqual(draft.quote, "")
+        self.assertEqual(draft.scheme_id, "")
+        self.assertEqual(draft.basis, "")
+        self.assertFalse(labeled(app.checkbox, "确认快照内容完整，已保留相关上下文").value)
+        labeled(app.multiselect, "采纳哪些要素的候选引文 · US123").set_value(["F1"]).run(timeout=60)
+        labeled(app.button, "采纳所选候选引文 · US123").click().run(timeout=60)
+        self.assertEqual(len(app.exception), 0)
+        adopted = app.session_state[draft_key][0]
+        self.assertTrue(adopted.quote)
+        self.assertEqual(adopted.status, "unknown")
+        self.assertEqual(adopted.scheme_id, "")
+        self.assertEqual(adopted.basis, "")
+        self.assertEqual(adopted.origin, "auto")
+        self.assertEqual(app.session_state["novelty_state"]["decision"].label, "insufficient_evidence")
 
 
 if __name__ == "__main__":

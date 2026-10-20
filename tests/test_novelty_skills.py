@@ -146,7 +146,8 @@ class SourceAndModelBoundaryTests(unittest.TestCase):
         doc = parse_google_page("https://patents.google.com/patent/US123/en", html)
         self.assertEqual(doc.publication_date, "2023-06-01")
         self.assertEqual(sum(s.id.startswith("claim-") for s in doc.sections), 2)
-        self.assertTrue(doc.complete)
+        self.assertFalse(doc.complete)
+        self.assertTrue(doc.parsed_complete)
 
     def test_untrusted_host_and_redirect_are_rejected(self):
         for url in ["https://patents.google.com.evil.test/patent/US1", "https://example.com/patent/US1",
@@ -177,6 +178,10 @@ class SourceAndModelBoundaryTests(unittest.TestCase):
         result = model_suggest_rows(inputs["features"], inputs["documents"], client, True)
         self.assertFalse(result[0].reviewed)
         self.assertFalse(result[0].same_scheme_confirmed)
+        self.assertEqual(result[0].reviewer, "")
+        self.assertEqual(result[0].reviewed_at, "")
+        self.assertEqual(result[0].input_hash, "")
+        self.assertTrue(all(row.origin == "model" for row in result[0].rows))
 
 
 def as_row(feature):

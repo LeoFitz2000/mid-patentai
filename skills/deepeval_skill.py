@@ -121,6 +121,8 @@ def run_basic_evals() -> dict:
                        "total": sum(row["skill"] == skill for row in results)}
                for skill in ("langgraph", "llamaindex", "deepeval")}
     return {"dataset_version": data["dataset_version"], "provenance": data["provenance"],
+            "fixture_contract_version": 2,
+            "review_provenance": "合成夹具模拟的复核字段，不是真实人员提交记录。",
             "created_at": datetime.now(timezone.utc).isoformat(),
             "versions": {package: importlib.metadata.version(package)
                          for package in ("langgraph", "llama-index-core", "deepeval")},

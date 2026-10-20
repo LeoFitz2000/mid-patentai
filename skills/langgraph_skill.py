@@ -53,6 +53,7 @@ def suggest_rows(features: list[Feature], documents: list[PatentDocument],
                 feature.id, "unknown", section.id if section else "",
                 section.text if section else "", section.id if section else "",
                 lexicon.candidate_match(feature.text, section.text) if section else "unresolved",
+                origin="auto",
             ))
         reviews.append(DocumentReview(doc.id, tuple(rows)))
     return reviews
@@ -105,7 +106,7 @@ def model_suggest_rows(features: list[Feature], documents: list[PatentDocument],
                 not fields["quote"].strip() or fields["quote"] not in sections.get(fields["section_id"], "")
             ):
                 raise ValueError("模型引文无法回查原文，未接纳本次模型对照。")
-            rows.append(EvidenceRow(**fields))
+            rows.append(EvidenceRow(**fields, origin="model"))
         if row_ids != feature_ids:
             raise ValueError("模型遗漏技术要素，未接纳本次对照。")
         result.append(DocumentReview(doc_id, tuple(rows)))  # reviewed 始终为 False。

@@ -4,16 +4,19 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from datetime import datetime, timezone
+from urllib.parse import quote as url_quote
 
 
 def report_payload(state: dict, invention: str, cutoff: str, lexicon_groups: list) -> dict:
     return {
+        "report_schema_version": 2,
         "created_at": datetime.now(timezone.utc).isoformat(), "task": "CN_novelty_precheck",
         "scope": "Google Patents；整套用户确认要素；不展开独立/从属权利要求",
         "cutoff": cutoff, "invention": invention,
         "features": [asdict(f) for f in state["features"]],
         "documents": [doc.to_dict() | {"snapshot_hash": doc.snapshot_hash} for doc in state["documents"]],
         "reviews": [asdict(review) for review in state.get("reviews", [])],
+        "candidate_reviews": [asdict(review) for review in state.get("suggestions", [])],
         "decision": asdict(state["decision"]), "trace": state["trace"], "synonym_groups": lexicon_groups,
         "material_unknowns": state.get("material_unknowns", []),
         "material_warnings": state.get("material_warnings", []),
@@ -36,15 +39,31 @@ def to_markdown(payload: dict) -> str:
         lines += ["", f"## {doc['id']} · {doc['title']}", f"来源：{doc['url']}",
                   f"公开日：{doc['publication_date'] or '未取得'}；申请日：{doc['filing_date'] or '未取得'}；"
                   f"优先权日：{doc['priority_date'] or '未取得'}",
-                  f"资料类型：{doc['source_kind']}；完整性人工/解析标记：{doc['complete']}",
+                  f"资料类型：{doc['source_kind']}；快照格式：{doc.get('snapshot_schema_version', 1)}",
+                  (f"完整性人工确认：{doc['complete']}；解析结构提示：{doc.get('parsed_complete', False)}"
+                   if doc.get('snapshot_schema_version') == 2 else
+                   f"历史完整性标记：{doc['complete']}（不自动视为新的人工确认）"),
                   f"快照 SHA-256：`{doc['snapshot_hash']}`"]
+        sections = {section['id']: section for section in doc['sections']}
         review = reviews.get(doc["id"])
         if review:
-            lines += [f"人工复核：{review['reviewed']}；同一方案确认：{review['same_scheme_confirmed']}；"
-                      f"充分公开确认：{review['enabling_disclosure_confirmed']}"]
+            lines += [f"提交复核标记：{review['reviewed']}；同一方案确认：{review['same_scheme_confirmed']}；"
+                      f"充分公开确认：{review['enabling_disclosure_confirmed']}",
+                      f"复核人（自填）：{review.get('reviewer') or '未记录'}；提交时间：{review.get('reviewed_at') or '未记录'}",
+                      f"复核输入绑定：`{review.get('input_hash') or '历史记录未绑定，须重新复核'}`",
+                      f"同一方案说明：{review.get('same_scheme_basis') or '未提供'}；"
+                      f"依据位置：{', '.join(review.get('scheme_section_ids', [])) or '未提供'}"]
             for row in review["rows"]:
-                lines += [f"- {row['feature_id']}：{row['status']}；原文位置={row['section_id']}；"
-                          f"技术方案={row['scheme_id']}；匹配依据={row['basis']}", f"  引文：{row['quote'] or '未取得'}"]
+                section = sections.get(row['section_id'], {})
+                location = section.get('source_location') or f"旧版快照内部编号 {row['section_id']}（非原文权利要求号）"
+                anchor = section.get('source_anchor')
+                link = doc['url'] + ('#' + url_quote(anchor, safe='') if anchor else '')
+                origin = {'auto': '自动定位候选', 'model': '模型候选', 'human': '人工填写'}.get(row.get('origin'), '历史来源未记录')
+                lines += [f"- {row['feature_id']}：{row['status']}；原文位置=[{location}]({link})；内部ID={row['section_id']}；"
+                          f"技术方案={row['scheme_id']}；引文来源={origin}；人工复核说明={row['basis'] or '未提供'}",
+                          f"  引文：{row['quote'] or '未取得'}"]
+    if payload.get('report_schema_version') == 2:
+        lines += ["", "复核身份为操作人自行填写，系统不核验姓名或专业资质；候选建议另存于JSON，不等于最终复核。"]
     lines += ["", "## 执行记录", " → ".join(payload["trace"]), "", "## 适用边界"]
     lines += [f"- {limit}" for limit in payload["limits"]]
     if payload.get("material_case"):
