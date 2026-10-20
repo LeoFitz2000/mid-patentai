@@ -51,8 +51,9 @@
 ## 运行与解释结果
 
 ```powershell
-.\.venv\Scripts\python.exe -X utf8 -m skills.deepeval_skill --output reports/basic_eval.json
-.\.venv\Scripts\python.exe -X utf8 -m unittest discover -s tests -v
+$runId = Get-Date -Format 'yyyyMMdd-HHmmss-ffffff'
+.\.venv-novelty\Scripts\python.exe -X utf8 -m skills.deepeval_skill --output ".local/verification/basic-$runId.json"
+.\.venv-novelty\Scripts\python.exe -X utf8 tools/run_verification.py --output-dir ".local/verification/engineering-$runId"
 ```
 
 基础 eval 无需 API Key，禁止把教学合成公开号当真实检索结果。所有教学文献标记 synthetic_eval；正常 Harness 拒绝将其用于真实预筛。原表的 FTO 例子作为越界回归保留，而不是按 FTO 规则打分。
@@ -60,3 +61,5 @@
 当前报告的通过率只反映固定合成题，不证明真实检索覆盖率、同义词覆盖率或专业法律判断准确率。下一阶段应建立真实 Google Patents 快照题，由专业人员独立标注，按专利族分离开发集与盲测集；每条记录基准日、要素、证据、判断和分歧。金标准不输入被测检索器，真实结果需同时报告风险漏报、错误放行、拒答及覆盖率。
 
 旧 modules/eval_ranker.py 仍可评测固定候选集排序，不能解释为 Google Patents 全库覆盖率。
+
+0.2.0新增[真实来源运行与参考接口](real-evaluation.md)，与合成题分开。真实输出先保存、参考后读取；尚无独立人工参考的两套方案保留证据不足，漏报/误放不填零。原方案与POM变更属于同一案例族，不是独立盲测集；现有教学参考也不是外部独立的专业标注。

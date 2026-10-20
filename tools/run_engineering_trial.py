@@ -39,6 +39,8 @@ def main() -> int:
     parser.add_argument("--seed", type=int)
     parser.add_argument("--model", default="deepseek-flash")
     args = parser.parse_args()
+    if args.output_dir.exists():
+        parser.error("输出目录已存在，请选一个新的运行目录；不覆盖历史结果。")
     sys.path.insert(0, str(args.project_root.resolve()))
     from modules.llm_client import LLMClient
     from modules.novelty_matching import SynonymLexicon
@@ -75,7 +77,7 @@ def main() -> int:
         text = text.replace(key, "[REDACTED]")
         return re.sub(r"sk-[A-Za-z0-9_-]{16,}", "[REDACTED]", text)
 
-    args.output_dir.mkdir(parents=True, exist_ok=True)
+    args.output_dir.mkdir(parents=True, exist_ok=False)
     model_calls = []
 
     def recording_post(url, **kwargs):
@@ -110,7 +112,7 @@ def main() -> int:
         state = harness.run(features=features, cutoff=case["cutoff"], documents=documents)
         try:
             reviews = model_suggest_rows(features, documents, client, confirmed=True)
-            state = harness.run(features=features, cutoff=case["cutoff"], documents=documents, reviews=reviews)
+            state["suggestions"] = reviews
             state["model_status"] = "success"
         except (RuntimeError, ValueError) as exc:
             state["model_status"] = "failed"
@@ -153,7 +155,7 @@ def main() -> int:
         lines.append(f"| {title} | {state['model_status']} | {state['decision'].text} |")
     lines += ["", "**没有专业人员人工复核，所以 reviewed 始终为 false。模型对照不冒充人工确认，系统的保守结果不是自动宣告可授权。**",
               "", "## 修改版逐文献对照（模型建议，待复核）"]
-    for review in states["modified"].get("reviews", []):
+    for review in states["modified"].get("suggestions", []):
         lines += ["", f"### {review.document_id}", "| 要素 | 建议状态 | 原文位置 | 引文 |", "|---|---|---|---|"]
         for row in review.rows:
             quote = row.quote.replace("|", "\\|").replace("\n", " ")

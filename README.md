@@ -2,7 +2,7 @@
 
 > **材料接手与案件留存**：在现有主流程中接入材料上传、原件哈希、AI 对话整理要素与案件结果保存。使用与限制见 [材料接手说明](docs/local-integration.md)。保存材料不调用模型；原有人工复核与新颖性规则保持有效。
 
-当前开发版本：**0.2.0**（材料可靠性与证据复核，见 [VERSION](VERSION)）。[版本记录](CHANGELOG.md) · [版本与提交约定](CONTRIBUTING.md)。
+当前本地版本：**0.2.0**（四阶段可靠性修复完成，尚未合并发布，见 [VERSION](VERSION)）。[版本记录](CHANGELOG.md) · [版本与提交约定](CONTRIBUTING.md)。
 
 保存新材料保留当前工作内容；显式切换前另存草稿。AI 整理结果按轮留存，文字附件引文可机械回查；材料未知项和未校验出处进入判断限制。新快照记录原文编号和锚点，候选与最终复核分开；实际提交记录自填复核人、时间和输入绑定。见[证据定位与复核说明](docs/evidence-review.md)。第三阶段增加[逐要素检索记录与相关性关卡](docs/search-evidence.md)，保留实际查询和失败，超长查询明确拒绝。
 
@@ -115,7 +115,7 @@ flowchart TD
 
 ## 快速启动
 
-在 `W:\patentai\patent_workflow` 文件夹运行：
+在项目根目录运行：
 
 ```powershell
 .\start_novelty.ps1
@@ -223,8 +223,9 @@ FTO、侵权等其他任务返回 `out_of_scope`，不进入在线检索。
 侧栏可一键运行三个 skill 的基础 eval；它是独立离线回归，无需 API Key，不调用付费模型。
 
 ```powershell
-.\.venv-novelty\Scripts\python.exe -X utf8 -m skills.deepeval_skill --output reports/basic_eval.json
-.\.venv-novelty\Scripts\python.exe -X utf8 -m unittest discover -s tests -v
+$runId = Get-Date -Format 'yyyyMMdd-HHmmss-ffffff'
+.\.venv-novelty\Scripts\python.exe -X utf8 -m skills.deepeval_skill --output ".local/verification/basic-$runId.json"
+.\.venv-novelty\Scripts\python.exe -X utf8 tools/run_verification.py --output-dir ".local/verification/engineering-$runId"
 ```
 
 分别验证三个 skill：
@@ -250,6 +251,8 @@ FTO、侵权等其他任务返回 `out_of_scope`，不进入在线检索。
 
 **34 条基础 eval 是教学合成回归，不代表实际专利专业准确率。** 正常预筛拒绝将 `synthetic_eval` 文献作为真实来源。真实金标准应由专业人员另行标注，记录来源、基准日、要素与引文，并隔离开发集和盲测集。界面外发流程使用模拟响应测试；真实工程案例另完成两次 DeepSeek 调用，记录见上方试运行报告。
 
+0.2.0将当前工程与旧模块兼容测试分组，新增两套不预设标签的真实来源运行及独立参考接口。没有独立参考时，漏报/误放为不可计算，拒答单独计数；AI草案不算人工金标准。详见[真实来源与评估说明](docs/real-evaluation.md)。合成eval、真实运行和工程试验均使用新文件或新目录，不覆盖历史报告。
+
 ## 数据流与适用边界
 
 | 去向 | 发送或保存的内容 | 触发方式 |
@@ -267,7 +270,7 @@ FTO、侵权等其他任务返回 `out_of_scope`，不进入在线检索。
 
 **网页无法访问或只取得搜索摘要：**使用人工原文入口，粘贴同一 Google Patents 页面相关权利要求和说明书，保留链接、日期和上下文。已记录的检索错误不会自动消失，预筛仍会保留相应缺口；不要把失败或空结果解释为没有现有技术。
 
-**对照看似匹配，仍输出证据不足：**检查完整性标记、公开日期、逐字引文、要素是否仍为 `unknown`，以及同一方案和充分公开是否已经人工确认。
+**对照看似匹配，仍输出证据不足：**检查实际检索缺口、技术相关性及依据、完整性、公开日期、逐字引文、未知要素、同一方案和充分公开的确认。AI候选不能代替这些确认。
 
 **修改后仍看到旧记录：**改变输入、日期、检索设置或术语表后重新建立对照；改变对照或撤销复核确认后，重新运行第 3 步。
 

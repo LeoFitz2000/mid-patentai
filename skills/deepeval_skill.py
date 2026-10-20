@@ -29,7 +29,7 @@ from skills.llamaindex_skill import PatentRetriever
 
 
 class NoveltyContractMetric(BaseMetric):
-    """比较独立标注标签和必须引用的文献，不用被测系统自评分。"""
+    """比较显式教学参考标签和引用；不是外部独立的专业专利标注。"""
 
     def __init__(self) -> None:
         self.threshold = 1.0
@@ -121,6 +121,8 @@ def run_basic_evals() -> dict:
                        "total": sum(row["skill"] == skill for row in results)}
                for skill in ("langgraph", "llamaindex", "deepeval")}
     return {"dataset_version": data["dataset_version"], "provenance": data["provenance"],
+            "evaluation_kind": "synthetic_rule_regression",
+            "reference_provenance": "author_written_teaching_reference_not_independent_patent_labels",
             "fixture_contract_version": 3,
             "review_provenance": "合成夹具模拟的复核字段，不是真实人员提交记录。",
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -132,11 +134,16 @@ def run_basic_evals() -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="三个 skill 的离线基础 eval")
-    parser.add_argument("--output", type=Path, default=Path("reports/basic_eval.json"))
+    parser.add_argument("--output", type=Path, help="新文件；默认在.local/evaluations/创建带时刻的新记录")
     args = parser.parse_args()
+    if args.output is None:
+        args.output = Path(".local/evaluations") / ("basic-" + datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S-%f") + ".json")
+    if args.output.exists():
+        parser.error("输出文件已存在，请使用新文件名；不覆盖历史评测。")
     report = run_basic_evals()
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    with args.output.open("x", encoding="utf-8") as stream:
+        json.dump(report, stream, ensure_ascii=False, indent=2)
     print(json.dumps({"all_passed": report["all_passed"], "summary": report["summary"],
                       "report": str(args.output)}, ensure_ascii=False, indent=2))
     raise SystemExit(0 if report["all_passed"] else 1)
