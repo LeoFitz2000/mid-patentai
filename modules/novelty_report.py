@@ -15,6 +15,8 @@ def report_payload(state: dict, invention: str, cutoff: str, lexicon_groups: lis
         "documents": [doc.to_dict() | {"snapshot_hash": doc.snapshot_hash} for doc in state["documents"]],
         "reviews": [asdict(review) for review in state.get("reviews", [])],
         "decision": asdict(state["decision"]), "trace": state["trace"], "synonym_groups": lexicon_groups,
+        "material_unknowns": state.get("material_unknowns", []),
+        "material_warnings": state.get("material_warnings", []),
         "limits": ["未发现完整披露不等于可以授权。", "同义词匹配不证明技术披露或法律等同。",
                    "Google Patents 不包含全部非专利现有技术；日期、抵触申请、充分公开等须人工核验。"],
     }
@@ -54,9 +56,16 @@ def to_markdown(payload: dict) -> str:
         preparation = payload.get("feature_preparation")
         if preparation:
             lines += ["", "AI 整理候选不等于人工复核；附件引文的语义支持仍须核查。"]
+            if preparation.get("preparation_ref"):
+                revision = preparation["preparation_ref"]
+                lines += [f"整理版本：{revision['path']}；SHA-256：`{revision['sha256']}`"]
+            if not payload.get("feature_preparation_matches_input", True):
+                lines += ["当前要素已修改：以下出处属于原整理候选，不自动视为新要素的材料支持。"]
             for feature in preparation["features"]:
                 for evidence in feature["evidence"]:
-                    lines += [f"- {feature['id']}：{evidence['source']} / {evidence['location']}；原文：{evidence['quote']}"]
+                    validation = {"verified_exact_text": "逐字引文已机器回查（不代表语义确认）",
+                                  "not_machine_verified": "引文未机器校验"}.get(evidence.get("quote_validation"), "引文未机器校验")
+                    lines += [f"- {feature['id']}：{evidence['source']} / {evidence['location']}；{validation}；原文：{evidence['quote']}"]
             lines += [f"- 材料未知项：{item}" for item in preparation["unknowns"]]
     lines += ["", "基础 eval 是单独的合成回归测试，不是本报告的专业正确性认证。"]
     return "\n\n".join(lines)

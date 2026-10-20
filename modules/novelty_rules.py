@@ -15,7 +15,9 @@ from modules.novelty_models import (
 
 def assess_novelty(features: list[Feature], documents: list[PatentDocument],
                    reviews: list[DocumentReview], cutoff: str, *, task: str = "novelty",
-                   errors: list[str] | None = None, allow_synthetic: bool = False) -> NoveltyDecision:
+                   errors: list[str] | None = None, allow_synthetic: bool = False,
+                   material_unknowns: list[str] | None = None,
+                   material_warnings: list[str] | None = None) -> NoveltyDecision:
     if task != "novelty":
         return NoveltyDecision("out_of_scope", ["仅支持新颖性预筛，不输出侵权、FTO 或可授权性判断。"])
     baseline = check_cutoff(cutoff)
@@ -24,6 +26,11 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
     if len({d.id for d in documents}) != len(documents):
         raise ValueError("文献编号重复，请先按公开号去重。")
     warnings = list(errors or [])
+    for values, prefix in ((material_unknowns, "材料未知项："), (material_warnings, "材料核查缺口：")):
+        if values is not None and (not isinstance(values, list) or any(not isinstance(x, str) for x in values)):
+            raise ValueError("材料未知项与核查缺口须为文字列表。")
+        warnings.extend(prefix + value.strip() for value in values or [] if value.strip())
+    warnings = list(dict.fromkeys(warnings))
     review_by_id = {review.document_id: review for review in reviews}
     if len(review_by_id) != len(reviews) or set(review_by_id) - {doc.id for doc in documents}:
         warnings.append("存在重复或不属于当前文献集的复核，不能用于判断。")

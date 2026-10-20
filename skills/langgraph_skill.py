@@ -33,6 +33,8 @@ class NoveltyState(TypedDict, total=False):
     documents: list[PatentDocument]
     reviews: list[DocumentReview]
     errors: list[str]
+    material_unknowns: list[str]
+    material_warnings: list[str]
     suggestions: list[DocumentReview]
     hits: list[dict]
     decision: NoveltyDecision
@@ -186,7 +188,9 @@ class NoveltyHarness:
     def _decide(self, state: NoveltyState) -> dict:
         decision = assess_novelty(state["features"], state.get("documents", []), state.get("reviews", []),
                                   state.get("cutoff", "2000-01-01"), task=state["task"],
-                                  errors=state.get("errors"), allow_synthetic=self.allow_synthetic)
+                                  errors=state.get("errors"), allow_synthetic=self.allow_synthetic,
+                                  material_unknowns=state.get("material_unknowns"),
+                                  material_warnings=state.get("material_warnings"))
         return {"decision": decision, "trace": state["trace"] + ["decide"]}
 
     def run(self, **state) -> NoveltyState:

@@ -62,6 +62,19 @@ class LangGraphSkillEvals(unittest.TestCase):
         self.assertIn("串联", features[1].text)
         self.assertIn("10 kPa", features[1].text)
 
+    def test_material_gaps_block_absence_without_hiding_existing_risk(self):
+        for label in ("no_complete_disclosure_found", "potential_novelty_risk"):
+            case = next(c for c in dataset()["cases"] if c["expected"] == label)
+            inputs = case_inputs(case)
+            self.assertEqual(assess_novelty(**inputs, allow_synthetic=True).label, label)
+            for context in ({"material_unknowns": ["关键连接方式未定"]},
+                            {"material_warnings": ["附件引文未机器校验"]}):
+                with self.subTest(label=label, context=context):
+                    state = NoveltyHarness(allow_synthetic=True).run(**inputs, **context)
+                    expected = "potential_novelty_risk" if label == "potential_novelty_risk" else "insufficient_evidence"
+                    self.assertEqual(state["decision"].label, expected)
+                    self.assertTrue(state["decision"].warnings)
+
 
 class LlamaIndexSkillEvals(unittest.TestCase):
     def test_synonyms_rank_same_original_source_first(self):

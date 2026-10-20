@@ -6,11 +6,37 @@ from pathlib import Path
 
 import streamlit as st
 
-from modules.material_cases import load_case, load_prepared_features, reference, save_case
+from modules.material_cases import (load_case, load_prepared_features, reference,
+                                    save_case, save_working_draft)
 
 
 def cases_root() -> Path:
     return Path(os.getenv("PATENT_CASES_DIR", str(Path(__file__).parents[1] / ".local" / "cases")))
+
+
+def has_working_content() -> bool:
+    return bool(st.session_state.get("invention_input", "").strip()
+                or st.session_state.get("feature_text_input", "").strip()
+                or st.session_state.get("active_material_case")
+                or st.session_state.get("novelty_state"))
+
+
+def preserve_working_draft() -> None:
+    if has_working_content():
+        path = save_working_draft(cases_root(), st.session_state.get("invention_input", ""),
+                                  st.session_state.get("feature_text_input", ""),
+                                  st.session_state.get("active_material_case"),
+                                  st.session_state.get("last_generated_report"))
+        st.session_state["last_working_draft"] = str(path)
+        st.info(f"替换前的工作草稿已另存：{path}")
+
+
+def activate_case(saved: dict, case: dict) -> None:
+    st.session_state["active_material_case"] = saved
+    st.session_state["invention_input"] = case["idea"]
+    st.session_state["feature_text_input"] = ""
+    for key in ("prepared_material_features", "novelty_state", "novelty_signature", "last_generated_report"):
+        st.session_state.pop(key, None)
 
 
 def render_material_intake() -> None:
@@ -23,13 +49,12 @@ def render_material_intake() -> None:
         if st.button("保存材料，交给 AI 整理"):
             try:
                 saved = save_case(cases_root(), idea, [(f.name, f.getvalue()) for f in uploads])
-                st.session_state["active_material_case"] = saved
-                st.session_state["invention_input"] = idea.strip()
-                st.session_state["feature_text_input"] = ""
-                st.session_state.pop("prepared_material_features", None)
-                st.session_state.pop("novelty_state", None)
-                st.session_state.pop("novelty_signature", None)
-                st.success("材料已保存。请在此整合项目的 AI 对话中说“开始初筛”。")
+                st.session_state["last_saved_material_case"] = saved
+                if has_working_content():
+                    st.success(f"新材料已保存为 {saved['case_id']}；当前案件、描述和要素已保留。需要切换时在下方打开该案件。")
+                else:
+                    activate_case(saved, load_case(cases_root(), saved["case_id"]))
+                    st.success("材料已保存。请在此整合项目的 AI 对话中说“开始初筛”。")
             except (OSError, ValueError, TypeError) as exc:
                 st.error(str(exc))
         recent = sorted(cases_root().glob("case-*/case.json"), reverse=True)[:20]
@@ -38,11 +63,9 @@ def render_material_intake() -> None:
             if st.button("打开已保存案件"):
                 try:
                     case = load_case(cases_root(), selected)
-                    st.session_state["active_material_case"] = reference(cases_root(), selected)
-                    st.session_state["invention_input"] = case["idea"]
-                    st.session_state["feature_text_input"] = ""
-                    for key in ("prepared_material_features", "novelty_state", "novelty_signature"):
-                        st.session_state.pop(key, None)
+                    saved = reference(cases_root(), selected)
+                    preserve_working_draft()
+                    activate_case(saved, case)
                 except (OSError, ValueError, KeyError, TypeError) as exc:
                     st.error(str(exc))
         active = st.session_state.get("active_material_case")
@@ -54,16 +77,23 @@ def render_material_intake() -> None:
                 if st.button("载入 AI 整理的要素"):
                     prepared = load_prepared_features(cases_root(), active["case_id"])
                     case = load_case(cases_root(), active["case_id"])
-                    st.session_state["invention_input"] = case["idea"]
+                    if st.session_state.get("feature_text_input", "").strip():
+                        preserve_working_draft()
+                    if not st.session_state.get("invention_input", "").strip():
+                        st.session_state["invention_input"] = case["idea"]
                     st.session_state["feature_text_input"] = prepared["feature_text"]
                     st.session_state["prepared_material_features"] = prepared
                     st.session_state.pop("novelty_state", None)
                     st.session_state.pop("novelty_signature", None)
+                    st.session_state.pop("last_generated_report", None)
                     st.success("已载入 AI 整理候选，可继续检索。此状态不等同人工复核或最终专利判断。")
                 prepared = st.session_state.get("prepared_material_features")
                 if prepared:
                     for unknown in prepared["unknowns"]:
                         st.warning("材料未知项：" + unknown)
+                    for warning in prepared.get("warnings", []):
+                        st.warning(warning)
+                    st.caption(f"整理版本：{prepared['preparation_ref']['path']}")
                     with st.expander("查看要素的材料出处"):
                         st.json(prepared["features"])
             except FileNotFoundError:

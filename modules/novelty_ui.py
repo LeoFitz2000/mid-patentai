@@ -73,7 +73,17 @@ def main() -> None:
     query = st.text_input("Google Patents 检索词（可选）")
     st.caption("先按整套要素评估，不区分独立/从属权利要求。基准日及优先权适用性由你确认。")
     st.info("检索会把检索词发送到 Google Patents。只有另行确认后，选定要素和原文才会发送到模型。")
-    signature = fingerprint(invention, feature_text, cutoff, query, str(max_documents), json.dumps(lexicon.groups, ensure_ascii=False))
+    prepared = st.session_state.get("prepared_material_features")
+    material_context = {"material_unknowns": list(prepared.get("unknowns", [])) if prepared else [],
+                        "material_warnings": list(prepared.get("warnings", [])) if prepared else []}
+    if prepared and prepared["feature_text"] != feature_text:
+        material_context["material_warnings"].append("当前要素已修改，原整理出处不能自动证明新要素的材料支持。")
+    material_identity = {"case": st.session_state.get("active_material_case"),
+                         "preparation": prepared.get("preparation_ref") if prepared else None,
+                         **material_context}
+    signature = fingerprint(invention, feature_text, cutoff, query, str(max_documents),
+                            json.dumps(lexicon.groups, ensure_ascii=False),
+                            json.dumps(material_identity, ensure_ascii=False, sort_keys=True))
     harness = NoveltyHarness(lexicon=lexicon, max_documents=max_documents)
     state = st.session_state.get("novelty_state") if st.session_state.get("novelty_signature") == signature else None
 
@@ -81,7 +91,7 @@ def main() -> None:
         st.session_state.pop("novelty_state", None)
         try:
             with st.spinner("扩展同义词、检索文献并读取原文…"):
-                state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff)
+                state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff, **material_context)
             st.session_state["novelty_state"] = state
             st.session_state["novelty_signature"] = signature
             st.session_state["review_epoch"] = 0
@@ -102,7 +112,7 @@ def main() -> None:
                                                   manual_filing, manual_priority, manual_complete)
                 documents = [doc for doc in (state or {}).get("documents", []) if doc.id != document.id] + [document]
                 state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff, documents=documents,
-                                    errors=(state or {}).get("errors", []))
+                                    errors=(state or {}).get("errors", []), **material_context)
                 st.session_state["novelty_state"] = state
                 st.session_state["novelty_signature"] = signature
                 st.session_state["review_epoch"] = st.session_state.get("review_epoch", 0) + 1
@@ -145,7 +155,8 @@ def main() -> None:
                 state["suggestions"] = list(merged.values())
                 state["reviews"] = []
                 state["decision"] = harness.run(features=state["features"], cutoff=cutoff,
-                                                documents=state["documents"], errors=state.get("errors", []))["decision"]
+                                                documents=state["documents"], errors=state.get("errors", []),
+                                                **material_context)["decision"]
                 st.session_state["review_epoch"] = st.session_state.get("review_epoch", 0) + 1
             except (RuntimeError, ValueError, PermissionError) as exc:
                 st.error(str(exc))
@@ -176,7 +187,7 @@ def main() -> None:
     if st.button("3 · 根据已复核对照进行新颖性预筛"):
         try:
             state = harness.run(features=state["features"], cutoff=cutoff, documents=checked_documents,
-                                reviews=pending_reviews, errors=state.get("errors", []))
+                                reviews=pending_reviews, errors=state.get("errors", []), **material_context)
             state["suggestions"] = pending_reviews
             st.session_state["novelty_state"] = state
         except (RuntimeError, ValueError) as exc:
@@ -205,12 +216,14 @@ def main() -> None:
                 raise ValueError("材料版本已变化，请重新保存并建立对照。")
             payload["material_case"] = current_case
             prepared = st.session_state.get("prepared_material_features")
-            if prepared and prepared["feature_text"] == feature_text:
+            if prepared:
                 payload["feature_preparation"] = prepared
+                payload["feature_preparation_matches_input"] = prepared["feature_text"] == feature_text
             case_ready = True
         except (OSError, ValueError, KeyError, TypeError) as exc:
             st.error(str(exc))
             return
+    st.session_state["last_generated_report"] = payload
     st.download_button("下载新颖性 Markdown 报告", to_markdown(payload), "novelty_report.md", "text/markdown")
     st.download_button("下载证据快照与判断记录 JSON", json.dumps(payload, ensure_ascii=False, indent=2),
                        "novelty_evidence.json", "application/json")
