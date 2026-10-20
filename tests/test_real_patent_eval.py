@@ -54,6 +54,14 @@ class RealEvaluationTests(unittest.TestCase):
                         {"author_type": "ai"}, {"reviewed_at": "2024-01-01T00:00:00"}, {"label": "grantable"}):
             self.assertEqual(summarize_real(self.observations(), [self.reference(**changes)])["reference_case_count"], 0)
 
+    def test_null_or_nontext_reference_identity_and_basis_are_not_scored(self):
+        for field in ("reviewer", "basis"):
+            for value in (None, False, 123, [], {}):
+                with self.subTest(field=field, value=value):
+                    result = summarize_real(self.observations(), [self.reference(**{field: value})])
+                    self.assertEqual(result["reference_case_count"], 0)
+                    self.assertIsNone(result["false_clearance_count"])
+
     def test_count_definitions_distinguish_missed_risk_clearance_and_refusal(self):
         refused = summarize_real(self.observations(), [self.reference()])
         self.assertEqual((refused["risk_miss_count"], refused["false_clearance_count"], refused["abstention_count"]), (1, 0, 1))

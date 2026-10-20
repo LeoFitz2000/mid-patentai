@@ -134,7 +134,8 @@ def summarize_real(observations: list[dict], references: list[dict]) -> dict:
         if (actual is None or reference.get("provenance") != "human_reviewed"
                 or reference.get("author_type") != "human"
                 or reference.get("input_hash") != actual["input_hash"] or not time_valid
-                or not str(reference.get("reviewer", "")).strip() or not str(reference.get("basis", "")).strip()
+                or any(not isinstance(reference.get(field), str) or not reference[field].strip()
+                       for field in ("reviewer", "basis"))
                 or reference.get("label") not in {"potential_novelty_risk", "no_complete_disclosure_found", "insufficient_evidence"}):
             rejected.append({"case_id": case_id, "reason": "非独立人工复核记录、缺少身份/时刻/说明，或输入绑定不符"})
             continue
