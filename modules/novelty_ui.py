@@ -18,7 +18,8 @@ from modules.llm_client import LLMClient
 from modules.material_cases import reference, save_result
 from modules.material_ui import cases_root, render_material_intake
 from modules.novelty_matching import SynonymLexicon
-from modules.novelty_models import DocumentReview, EvidenceRow
+from modules.novelty_models import DocumentReview, EvidenceRow, review_content, stamp_review
+from modules.novelty_review import adopt_candidate_quotes, edited_review_rows, empty_review_rows
 from modules.novelty_report import report_payload, to_markdown
 from skills.langgraph_skill import NoveltyHarness, model_suggest_rows
 
@@ -71,9 +72,20 @@ def main() -> None:
                                 placeholder="压力传感器\n压力传感器连接控制器\n控制器通过无线通信模块发送数据")
     cutoff = st.date_input("判断基准日", value=datetime.now(ZoneInfo("Asia/Shanghai")).date()).isoformat()
     query = st.text_input("Google Patents 检索词（可选）")
+    st.caption("留空时逐要素查询，再补充同义词；最多8条，每条最多400字，不截断。自定义检索词覆盖范围另行记录。")
     st.caption("先按整套要素评估，不区分独立/从属权利要求。基准日及优先权适用性由你确认。")
     st.info("检索会把检索词发送到 Google Patents。只有另行确认后，选定要素和原文才会发送到模型。")
-    signature = fingerprint(invention, feature_text, cutoff, query, str(max_documents), json.dumps(lexicon.groups, ensure_ascii=False))
+    prepared = st.session_state.get("prepared_material_features")
+    material_context = {"material_unknowns": list(prepared.get("unknowns", [])) if prepared else [],
+                        "material_warnings": list(prepared.get("warnings", [])) if prepared else []}
+    if prepared and prepared["feature_text"] != feature_text:
+        material_context["material_warnings"].append("当前要素已修改，原整理出处不能自动证明新要素的材料支持。")
+    material_identity = {"case": st.session_state.get("active_material_case"),
+                         "preparation": prepared.get("preparation_ref") if prepared else None,
+                         **material_context}
+    signature = fingerprint(invention, feature_text, cutoff, query, str(max_documents),
+                            json.dumps(lexicon.groups, ensure_ascii=False),
+                            json.dumps(material_identity, ensure_ascii=False, sort_keys=True))
     harness = NoveltyHarness(lexicon=lexicon, max_documents=max_documents)
     state = st.session_state.get("novelty_state") if st.session_state.get("novelty_signature") == signature else None
 
@@ -81,7 +93,7 @@ def main() -> None:
         st.session_state.pop("novelty_state", None)
         try:
             with st.spinner("扩展同义词、检索文献并读取原文…"):
-                state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff)
+                state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff, **material_context)
             st.session_state["novelty_state"] = state
             st.session_state["novelty_signature"] = signature
             st.session_state["review_epoch"] = 0
@@ -102,7 +114,9 @@ def main() -> None:
                                                   manual_filing, manual_priority, manual_complete)
                 documents = [doc for doc in (state or {}).get("documents", []) if doc.id != document.id] + [document]
                 state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff, documents=documents,
-                                    errors=(state or {}).get("errors", []))
+                                    errors=(state or {}).get("errors", []),
+                                    **({"search_audit": state["search_audit"]} if state and "search_audit" in state else {}),
+                                    **material_context)
                 st.session_state["novelty_state"] = state
                 st.session_state["novelty_signature"] = signature
                 st.session_state["review_epoch"] = st.session_state.get("review_epoch", 0) + 1
@@ -114,6 +128,22 @@ def main() -> None:
 
     st.divider()
     st.subheader("2 · 查看原文与候选对照")
+    audit = state["search_audit"]
+    with st.expander("本轮检索范围与记录"):
+        if audit["mode"] == "provided_snapshots":
+            st.write("仅比对提供的快照；本轮未执行在线检索，不能推断检索覆盖。")
+        else:
+            st.write("在线检索记录：所有计划内查询先执行，再按独立文献预算读取正文。词汇分数仅用于排序，相关性另行复核。")
+            st.dataframe([{"查询": r["id"], "要素": ", ".join(r["feature_ids"]) or "自定义范围",
+                           "实际检索词": r["query"], "状态": r["status"], "返回数": r["returned_count"],
+                           "开始": r["started_at"], "结束": r["finished_at"], "错误": r["error"]}
+                          for r in audit["queries"]], hide_index=True, width="stretch")
+            for skipped in audit.get("skipped", []):
+                st.warning(f"未发送：{', '.join(skipped['feature_ids']) or '自定义变体'} · {skipped['reason']}")
+            st.dataframe([{"公开号": c["publication_id"], "标题": c["title"], "链接": c["url"],
+                           "来自查询": ", ".join(c["query_ids"]), "词汇重合提示": c["lexical_hint"]["score"],
+                           "正文状态": c["fetch_status"], "获取错误": c["fetch_error"]}
+                          for c in audit["candidates"]], hide_index=True, width="stretch")
     for error in state.get("errors", []):
         st.warning(error)
     for doc in state["documents"]:
@@ -121,7 +151,8 @@ def main() -> None:
             st.link_button("打开 Google Patents 来源", doc.url)
             st.write(f"公开日：{doc.publication_date or '未取得'}；来源类型：{doc.source_kind}")
             for section in doc.sections:
-                st.text(f"[{section.id}] {section.text}")
+                location = section.source_location or "旧版快照内部编号（非原文权利要求号）"
+                st.text(f"[{section.id}] {location}：{section.text}")
     if state.get("hits"):
         st.dataframe(state["hits"], hide_index=True, width="stretch")
     st.caption("候选匹配分数不是新颖性概率。相似术语、否定句、连接方向及数值差异都要回看原文。")
@@ -145,7 +176,9 @@ def main() -> None:
                 state["suggestions"] = list(merged.values())
                 state["reviews"] = []
                 state["decision"] = harness.run(features=state["features"], cutoff=cutoff,
-                                                documents=state["documents"], errors=state.get("errors", []))["decision"]
+                                                documents=state["documents"], errors=state.get("errors", []),
+                                                search_audit=state["search_audit"],
+                                                **material_context)["decision"]
                 st.session_state["review_epoch"] = st.session_state.get("review_epoch", 0) + 1
             except (RuntimeError, ValueError, PermissionError) as exc:
                 st.error(str(exc))
@@ -153,36 +186,95 @@ def main() -> None:
     pending_reviews = []
     checked_documents = []
     suggestions_by_id = {review.document_id: review for review in state["suggestions"]}
+    committed_by_id = {review.document_id: review for review in state.get("reviews", [])}
+    reviewer = st.text_input("复核人姓名或代号（自行填写）", key="reviewer_alias").strip()
+    st.caption("此处记录操作人自填身份与提交时刻，不核验姓名、资质或执业身份。")
     for doc in state["documents"]:
         st.markdown(f"**复核 {doc.id}**")
         st.caption("disclosed=原文披露；not_found=本篇未找到；unknown=无法确定。同一技术方案使用相同方案编号，勿合并不同实施例。")
-        content_key = fingerprint(signature, doc.id, doc.publication_date, *(s.text for s in doc.sections),
+        content_key = fingerprint(signature, replace(doc, complete=False).snapshot_hash,
                                   str(st.session_state.get("review_epoch", 0)))
-        initial_rows = [asdict(row) for row in suggestions_by_id[doc.id].rows]
+        candidates = suggestions_by_id[doc.id].rows
+        with st.expander(f"候选建议（未确认） · {doc.id}"):
+            st.dataframe([asdict(row) for row in candidates], hide_index=True, width="stretch")
+        draft_key = f"review-draft-{content_key}"
+        if draft_key not in st.session_state:
+            st.session_state[draft_key] = empty_review_rows(state["features"])
+        draft_rows = st.session_state[draft_key]
+        initial_rows = [asdict(row) for row in draft_rows]
+        editor_epoch_key = f"editor-epoch-{content_key}"
+        editor_key = f"chart-{content_key}-{st.session_state.get(editor_epoch_key, 0)}"
         edited = st.data_editor(initial_rows, hide_index=True, width="stretch", num_rows="fixed",
-            key=f"chart-{content_key}", disabled=["feature_id", "basis"],
+            key=editor_key, disabled=["feature_id", "origin"],
             column_config={"status": st.column_config.SelectboxColumn("披露状态", options=["disclosed", "not_found", "unknown"], required=True),
                            "quote": st.column_config.TextColumn("逐字原文引文"),
                            "section_id": st.column_config.TextColumn("原文位置"),
-                           "scheme_id": st.column_config.TextColumn("同一技术方案编号")})
-        complete = st.checkbox("确认快照内容完整，已保留相关上下文", value=doc.complete, key=f"complete-{content_key}")
+                           "scheme_id": st.column_config.TextColumn("同一技术方案编号"),
+                           "basis": st.column_config.TextColumn("人工复核说明（状态改变时更新）"),
+                           "origin": st.column_config.TextColumn("引文来源")})
+        prior = committed_by_id.get(doc.id)
+        rows = edited_review_rows(edited, prior.rows if prior else draft_rows)
+        selected_quotes = st.multiselect(f"采纳哪些要素的候选引文 · {doc.id}",
+                                         [row.feature_id for row in candidates if row.quote.strip()],
+                                         key=f"adopt-selection-{content_key}")
+        if st.button(f"采纳所选候选引文 · {doc.id}", disabled=not selected_quotes):
+            st.session_state[draft_key] = adopt_candidate_quotes(rows, candidates, selected_quotes)
+            st.session_state[editor_epoch_key] = st.session_state.get(editor_epoch_key, 0) + 1
+            st.session_state[f"review-{content_key}"] = False
+            st.rerun()
+        sections_by_id = {section.id: section for section in doc.sections}
+        relevance = st.selectbox(f"技术相关性 · {doc.id}", ["unknown", "related", "unrelated"],
+            format_func=lambda value: {"unknown": "待核实", "related": "相关（说明技术关系）", "unrelated": "不相关（记录排除依据）"}[value],
+            key=f"relevance-{content_key}")
+        relevance_basis = st.text_area(f"相关性或排除依据 · {doc.id}", key=f"relevance-basis-{content_key}")
+        relevance_sections = st.multiselect(f"相关性依据位置 · {doc.id}", list(sections_by_id),
+            format_func=lambda key: f"{key} · {sections_by_id[key].source_location or '快照内部位置'}",
+            key=f"relevance-sections-{content_key}")
+        for row in rows:
+            if row.status in {"disclosed", "not_found"} and not row.basis.strip():
+                st.warning(f"{row.feature_id}：请填写或更新人工复核说明，旧说明不能自动沿用到新状态。")
+            section = sections_by_id.get(row.section_id)
+            if section and row.quote.strip() and row.quote.strip() == section.text.strip():
+                st.warning(f"{row.feature_id}：引文等于整段原文，请核对是否真正支持全部关系和限定。")
+        scheme_basis = st.text_area(f"同一技术方案的原文依据 · {doc.id}", key=f"scheme-basis-{content_key}")
+        scheme_sections = st.multiselect(f"同一方案依据位置 · {doc.id}", list(sections_by_id),
+            format_func=lambda key: f"{key} · {sections_by_id[key].source_location or '快照内部位置'}",
+            key=f"scheme-sections-{content_key}")
+        if doc.parsed_complete:
+            st.caption("解析器发现了权利要求和说明书；这仅是结构提示，不代表相关上下文完整。")
+        complete = st.checkbox("确认快照内容完整，已保留相关上下文", value=False, key=f"complete-{content_key}")
+        edit_signature = fingerprint(json.dumps([asdict(row) for row in rows], ensure_ascii=False),
+                                     str(complete), reviewer, scheme_basis, json.dumps(scheme_sections),
+                                     relevance, relevance_basis, json.dumps(relevance_sections))
+        last_edit_key = f"last-review-edit-{content_key}"
+        if last_edit_key in st.session_state and st.session_state[last_edit_key] != edit_signature:
+            for prefix in ("review", "scheme", "enabling"):
+                st.session_state[f"{prefix}-{content_key}"] = False
+        st.session_state[last_edit_key] = edit_signature
         reviewed = st.checkbox("我已逐项核对披露状态与引文（not_found 仅代表本次文献未找到）", key=f"review-{content_key}")
         same_scheme = st.checkbox("全部已披露要素属于同一技术方案，并非不同实施例的拼接", key=f"scheme-{content_key}")
         enabling = st.checkbox("确认相关披露可实施，且同义表述的技术含义和限定一致", key=f"enabling-{content_key}")
-        pending_reviews.append(DocumentReview(doc.id, tuple(EvidenceRow(**row) for row in edited),
-                                              reviewed, same_scheme, enabling))
+        pending_reviews.append(DocumentReview(doc.id, rows, reviewed, same_scheme, enabling,
+                                              reviewer=reviewer, same_scheme_basis=scheme_basis,
+                                              scheme_section_ids=tuple(scheme_sections), relevance=relevance,
+                                              relevance_basis=relevance_basis,
+                                              relevance_section_ids=tuple(relevance_sections)))
         checked_documents.append(replace(doc, complete=complete))
 
     if st.button("3 · 根据已复核对照进行新颖性预筛"):
         try:
+            candidates = state["suggestions"]
+            submitted = [stamp_review(review, state["features"], doc, cutoff)
+                         for review, doc in zip(pending_reviews, checked_documents)]
             state = harness.run(features=state["features"], cutoff=cutoff, documents=checked_documents,
-                                reviews=pending_reviews, errors=state.get("errors", []))
-            state["suggestions"] = pending_reviews
+                                reviews=submitted, errors=state.get("errors", []),
+                                search_audit=state["search_audit"], **material_context)
+            state["suggestions"] = candidates
             st.session_state["novelty_state"] = state
         except (RuntimeError, ValueError) as exc:
             st.error(str(exc))
     if state.get("reviews") and (
-        [asdict(review) for review in state["reviews"]] != [asdict(review) for review in pending_reviews]
+        [review_content(review) for review in state["reviews"]] != [review_content(review) for review in pending_reviews]
         or [doc.complete for doc in state["documents"]] != [doc.complete for doc in checked_documents]
     ):
         st.info("对照或复核确认已改变，请点击第 3 步重新预筛后再导出报告。")
@@ -205,12 +297,14 @@ def main() -> None:
                 raise ValueError("材料版本已变化，请重新保存并建立对照。")
             payload["material_case"] = current_case
             prepared = st.session_state.get("prepared_material_features")
-            if prepared and prepared["feature_text"] == feature_text:
+            if prepared:
                 payload["feature_preparation"] = prepared
+                payload["feature_preparation_matches_input"] = prepared["feature_text"] == feature_text
             case_ready = True
         except (OSError, ValueError, KeyError, TypeError) as exc:
             st.error(str(exc))
             return
+    st.session_state["last_generated_report"] = payload
     st.download_button("下载新颖性 Markdown 报告", to_markdown(payload), "novelty_report.md", "text/markdown")
     st.download_button("下载证据快照与判断记录 JSON", json.dumps(payload, ensure_ascii=False, indent=2),
                        "novelty_evidence.json", "application/json")

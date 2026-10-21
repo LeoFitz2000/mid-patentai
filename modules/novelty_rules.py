@@ -6,16 +6,21 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 
 from modules.novelty_models import (
     DocumentReview, Feature, NoveltyDecision, PatentDocument, check_cutoff, google_patent_url,
+    review_input_hash,
 )
+from modules.novelty_search import search_warnings
 
 
 def assess_novelty(features: list[Feature], documents: list[PatentDocument],
                    reviews: list[DocumentReview], cutoff: str, *, task: str = "novelty",
-                   errors: list[str] | None = None, allow_synthetic: bool = False) -> NoveltyDecision:
+                   errors: list[str] | None = None, allow_synthetic: bool = False,
+                   material_unknowns: list[str] | None = None,
+                   material_warnings: list[str] | None = None,
+                   search_audit: dict | None = None) -> NoveltyDecision:
     if task != "novelty":
         return NoveltyDecision("out_of_scope", ["仅支持新颖性预筛，不输出侵权、FTO 或可授权性判断。"])
     baseline = check_cutoff(cutoff)
@@ -24,6 +29,12 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
     if len({d.id for d in documents}) != len(documents):
         raise ValueError("文献编号重复，请先按公开号去重。")
     warnings = list(errors or [])
+    warnings.extend(search_warnings(search_audit, features, cutoff))
+    for values, prefix in ((material_unknowns, "材料未知项："), (material_warnings, "材料核查缺口：")):
+        if values is not None and (not isinstance(values, list) or any(not isinstance(x, str) for x in values)):
+            raise ValueError("材料未知项与核查缺口须为文字列表。")
+        warnings.extend(prefix + value.strip() for value in values or [] if value.strip())
+    warnings = list(dict.fromkeys(warnings))
     review_by_id = {review.document_id: review for review in reviews}
     if len(review_by_id) != len(reviews) or set(review_by_id) - {doc.id for doc in documents}:
         warnings.append("存在重复或不属于当前文献集的复核，不能用于判断。")
@@ -70,6 +81,23 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
         if not review or not review.reviewed:
             warnings.append(f"{doc.id}：对照尚未人工复核。")
             continue
+        try:
+            reviewed_at = datetime.fromisoformat(review.reviewed_at)
+            time_valid = reviewed_at.utcoffset() is not None
+        except (ValueError, TypeError):
+            time_valid = False
+        if (not review.reviewer.strip() or not time_valid
+                or review.input_hash != review_input_hash(features, doc, cutoff, review)):
+            warnings.append(f"{doc.id}：复核人、时刻或输入绑定缺失/已失效，请重新复核。")
+            continue
+        section_ids = {s.id for s in doc.sections}
+        if (review.relevance not in {"related", "unrelated"} or not review.relevance_basis.strip()
+                or not review.relevance_section_ids or not set(review.relevance_section_ids) <= section_ids):
+            warnings.append(f"{doc.id}：技术相关性未确认，或缺少说明及原文位置；词汇分数不能代替相关性。")
+            continue
+        if review.relevance == "unrelated":
+            warnings.append(f"{doc.id}：复核标为不相关，不能据此排除待判断方案的完整披露风险。")
+            continue
         by_feature = {row.feature_id: row for row in review.rows}
         if len(by_feature) != len(review.rows) or set(by_feature) != {f.id for f in features}:
             warnings.append(f"{doc.id}：要素对照存在重复、遗漏或额外编号。")
@@ -81,6 +109,8 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
             row = by_feature[feature.id]
             if row.status not in {"disclosed", "not_found", "unknown"} or row.status == "unknown":
                 valid = False
+            elif not row.basis.strip() or row.origin not in {"auto", "model", "human"}:
+                valid = False
             elif row.status == "disclosed":
                 # 必须是真实原文的逐字引文；真实引文是否语义支持要素，仍需人工确认。
                 if (not row.quote.strip() or not row.scheme_id.strip()
@@ -88,17 +118,20 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
                     valid = False
                 disclosed.append(row)
         if not valid:
-            warnings.append(f"{doc.id}：存在未知要素、错误状态或无法回查的引文。")
+            warnings.append(f"{doc.id}：存在未知要素、无效状态、缺失复核说明或无法回查的引文。")
             continue
         if not doc.complete:
             warnings.append(f"{doc.id}：资料不完整，不能据局部摘录排除完整披露。")
             continue
         fully_reviewed += 1
         if (len(disclosed) == len(features) and len({r.scheme_id for r in disclosed}) == 1
-                and review.same_scheme_confirmed and review.enabling_disclosure_confirmed):
+                and review.same_scheme_confirmed and review.enabling_disclosure_confirmed
+                and review.same_scheme_basis.strip() and review.scheme_section_ids
+                and set(review.scheme_section_ids) <= set(sections)
+                and {r.section_id for r in disclosed} <= set(review.scheme_section_ids)):
             risk_ids.append(doc.id)
         elif len(disclosed) == len(features):
-            warnings.append(f"{doc.id}：完整要素分属不同方案，或尚未确认同一方案和充分公开。")
+            warnings.append(f"{doc.id}：完整要素分属不同方案，或同一方案/充分公开的确认及原文依据不足。")
             fully_reviewed -= 1
     if risk_ids:
         return NoveltyDecision("potential_novelty_risk", [

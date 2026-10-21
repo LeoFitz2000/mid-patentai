@@ -17,9 +17,10 @@ from modules.json_output import parse_object
 from modules.novelty_matching import SynonymLexicon
 from modules.novelty_models import (
     DocumentReview, EvidenceRow, Feature, NoveltyDecision, PatentDocument,
-    check_cutoff, google_patent_url, parse_features,
+    check_cutoff, parse_features,
 )
 from modules.novelty_rules import assess_novelty
+from modules.novelty_search import retrieve_with_journal, snapshot_journal
 from modules.patent_search import search_patents
 from skills.llamaindex_skill import PatentRetriever
 
@@ -33,10 +34,13 @@ class NoveltyState(TypedDict, total=False):
     documents: list[PatentDocument]
     reviews: list[DocumentReview]
     errors: list[str]
+    material_unknowns: list[str]
+    material_warnings: list[str]
     suggestions: list[DocumentReview]
     hits: list[dict]
     decision: NoveltyDecision
     trace: list[str]
+    search_audit: dict
 
 
 def suggest_rows(features: list[Feature], documents: list[PatentDocument],
@@ -51,6 +55,7 @@ def suggest_rows(features: list[Feature], documents: list[PatentDocument],
                 feature.id, "unknown", section.id if section else "",
                 section.text if section else "", section.id if section else "",
                 lexicon.candidate_match(feature.text, section.text) if section else "unresolved",
+                origin="auto",
             ))
         reviews.append(DocumentReview(doc.id, tuple(rows)))
     return reviews
@@ -103,7 +108,7 @@ def model_suggest_rows(features: list[Feature], documents: list[PatentDocument],
                 not fields["quote"].strip() or fields["quote"] not in sections.get(fields["section_id"], "")
             ):
                 raise ValueError("模型引文无法回查原文，未接纳本次模型对照。")
-            rows.append(EvidenceRow(**fields))
+            rows.append(EvidenceRow(**fields, origin="model"))
         if row_ids != feature_ids:
             raise ValueError("模型遗漏技术要素，未接纳本次对照。")
         result.append(DocumentReview(doc_id, tuple(rows)))  # reviewed 始终为 False。
@@ -146,35 +151,13 @@ class NoveltyHarness:
         errors = list(state.get("errors", []))
         # 显式传入空快照集与未传快照不同：空集不会偷偷访问网络。
         if "documents" in state:
-            return {"documents": state["documents"], "errors": errors, "trace": state["trace"] + ["retrieve"]}
-        query = state.get("query", "").strip() or " ".join(f.text for f in state["features"])
-        documents: list[PatentDocument] = []
-        seen: set[str] = set()
-        for expanded in self.lexicon.expand_queries(query):
-            try:
-                raw = self.searcher(expanded, self.max_documents)
-                for item in raw:
-                    url = google_patent_url(str(item.get("url", "")))
-                    publication_id = url.split("/patent/", 1)[1].split("/")[0]
-                    if publication_id in seen:
-                        continue
-                    seen.add(publication_id)
-                    try:
-                        document = self.fetcher(url)
-                        if document.id != publication_id:
-                            raise ValueError("正文公开号与检索来源不一致。")
-                        documents.append(document)
-                    except (RuntimeError, ValueError) as exc:
-                        errors.append(f"{publication_id}：{exc}")
-                    if len(seen) >= self.max_documents:
-                        break
-            except (RuntimeError, ValueError) as exc:
-                errors.append(str(exc))
-            if len(seen) >= self.max_documents:
-                break
-        if not documents and not errors:
-            errors.append("Google Patents 没有返回可核对正文；不代表不存在相关现有技术。")
-        return {"documents": documents, "errors": errors, "trace": state["trace"] + ["retrieve"]}
+            audit = state["search_audit"] if "search_audit" in state else snapshot_journal(state["features"], state["cutoff"])
+            return {"documents": state["documents"], "search_audit": audit,
+                    "errors": errors, "trace": state["trace"] + ["retrieve"]}
+        documents, audit = retrieve_with_journal(state["features"], state["cutoff"], state.get("query", ""),
+            self.lexicon, self.searcher, self.fetcher, self.max_documents)
+        return {"documents": documents, "search_audit": audit,
+                "errors": errors, "trace": state["trace"] + ["retrieve"]}
 
     def _locate(self, state: NoveltyState) -> dict:
         retriever = PatentRetriever(state["documents"], self.lexicon, allow_synthetic=self.allow_synthetic)
@@ -186,7 +169,10 @@ class NoveltyHarness:
     def _decide(self, state: NoveltyState) -> dict:
         decision = assess_novelty(state["features"], state.get("documents", []), state.get("reviews", []),
                                   state.get("cutoff", "2000-01-01"), task=state["task"],
-                                  errors=state.get("errors"), allow_synthetic=self.allow_synthetic)
+                                  errors=state.get("errors"), allow_synthetic=self.allow_synthetic,
+                                  material_unknowns=state.get("material_unknowns"),
+                                  material_warnings=state.get("material_warnings"),
+                                  search_audit=state.get("search_audit"))
         return {"decision": decision, "trace": state["trace"] + ["decide"]}
 
     def run(self, **state) -> NoveltyState:

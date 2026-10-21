@@ -1,0 +1,9 @@
+{
+  "dataset_version": "real-source-1",
+  "provenance": "real_public_patent_sources_without_independent_human_gold",
+  "example": "examples/engineering_trial.json",
+  "cases": [
+    {"id": "ballpoint_original", "mutation_id": null},
+    {"id": "ballpoint_pom", "mutation_id": "pom_tooth_crowns"}
+  ]
+}

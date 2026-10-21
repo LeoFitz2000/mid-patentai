@@ -14,6 +14,7 @@ import requests
 GOOGLE_PATENTS_XHR = "https://patents.google.com/xhr/query"
 GOOGLE_PATENTS_HOME = "https://patents.google.com/"
 GOOGLE_PATENTS_HOST = "patents.google.com"
+MAX_QUERY_LENGTH = 400
 
 
 def _clean_text(value: object, limit: int) -> str:
@@ -97,9 +98,11 @@ def search_patents(
     """Fetch patent records from Google Patents' public search endpoint."""
     if not query.strip():
         raise ValueError("请填写专利检索词。")
+    if len(query.strip()) > MAX_QUERY_LENGTH:
+        raise ValueError("专利检索词超过 400 字，请拆分查询；不会静默截断。")
 
     count = max(1, min(max_results, 20))
-    inner_query = urlencode({"q": query.strip()[:400], "num": count})
+    inner_query = urlencode({"q": query.strip(), "num": count})
     try:
         response = get(
             GOOGLE_PATENTS_XHR,
