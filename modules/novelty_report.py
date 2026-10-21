@@ -45,5 +45,18 @@ def to_markdown(payload: dict) -> str:
                           f"技术方案={row['scheme_id']}；匹配依据={row['basis']}", f"  引文：{row['quote'] or '未取得'}"]
     lines += ["", "## 执行记录", " → ".join(payload["trace"]), "", "## 适用边界"]
     lines += [f"- {limit}" for limit in payload["limits"]]
+    if payload.get("material_case"):
+        material = payload["material_case"]
+        lines += ["", "## 原始材料案件", f"案件：{material['case_id']}",
+                  f"材料清单 SHA-256：`{material['case_sha256']}`"]
+        for attachment in material["attachments"]:
+            lines += [f"- {attachment['name']}；SHA-256：`{attachment['sha256']}`"]
+        preparation = payload.get("feature_preparation")
+        if preparation:
+            lines += ["", "AI 整理候选不等于人工复核；附件引文的语义支持仍须核查。"]
+            for feature in preparation["features"]:
+                for evidence in feature["evidence"]:
+                    lines += [f"- {feature['id']}：{evidence['source']} / {evidence['location']}；原文：{evidence['quote']}"]
+            lines += [f"- 材料未知项：{item}" for item in preparation["unknowns"]]
     lines += ["", "基础 eval 是单独的合成回归测试，不是本报告的专业正确性认证。"]
     return "\n\n".join(lines)

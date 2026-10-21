@@ -15,6 +15,8 @@ from dotenv import load_dotenv
 
 from modules.google_patent_documents import manual_google_document
 from modules.llm_client import LLMClient
+from modules.material_cases import reference, save_result
+from modules.material_ui import cases_root, render_material_intake
 from modules.novelty_matching import SynonymLexicon
 from modules.novelty_models import DocumentReview, EvidenceRow
 from modules.novelty_report import report_payload, to_markdown
@@ -62,8 +64,10 @@ def main() -> None:
         except ValueError as exc:
             st.error(str(exc))
             return
-    invention = st.text_area("发明描述", placeholder="描述完整技术方案；保留结构、连接关系、步骤、条件和数值。", height=110)
+    render_material_intake()
+    invention = st.text_area("发明描述", key="invention_input", placeholder="描述完整技术方案；保留结构、连接关系、步骤、条件和数值。", height=110)
     feature_text = st.text_area("确认待判断的技术要素（每行一个）", height=130,
+                                key="feature_text_input",
                                 placeholder="压力传感器\n压力传感器连接控制器\n控制器通过无线通信模块发送数据")
     cutoff = st.date_input("判断基准日", value=datetime.now(ZoneInfo("Asia/Shanghai")).date()).isoformat()
     query = st.text_input("Google Patents 检索词（可选）")
@@ -192,7 +196,28 @@ def main() -> None:
     for warning in decision.warnings:
         st.warning(warning)
     payload = report_payload(state, invention, cutoff, lexicon.groups)
+    active_case = st.session_state.get("active_material_case")
+    case_ready = False
+    if active_case:
+        try:
+            current_case = reference(cases_root(), active_case["case_id"])
+            if current_case != active_case:
+                raise ValueError("材料版本已变化，请重新保存并建立对照。")
+            payload["material_case"] = current_case
+            prepared = st.session_state.get("prepared_material_features")
+            if prepared and prepared["feature_text"] == feature_text:
+                payload["feature_preparation"] = prepared
+            case_ready = True
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            st.error(str(exc))
+            return
     st.download_button("下载新颖性 Markdown 报告", to_markdown(payload), "novelty_report.md", "text/markdown")
     st.download_button("下载证据快照与判断记录 JSON", json.dumps(payload, ensure_ascii=False, indent=2),
                        "novelty_evidence.json", "application/json")
+    if case_ready and st.button("保存本轮结果到案件"):
+        try:
+            saved_path = save_result(cases_root(), active_case["case_id"], payload, to_markdown(payload))
+            st.success(f"本轮结果已单独保存：{saved_path.name}。原始材料和以前的结果保持不变。")
+        except (OSError, ValueError) as exc:
+            st.error(str(exc))
     st.caption("本次未发现完整披露不等于具备新颖性或可以授权。资料范围仅为本次取得的 Google Patents 文献。")
