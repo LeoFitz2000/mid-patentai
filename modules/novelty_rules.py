@@ -1,7 +1,7 @@
 """CNIPA 新颖性预筛规则。结论受限于已检索、已复核的 Google Patents 快照。
 
 禁止跨文献/互斥实施例拼接。当前不处理创造性、FTO、从属引用展开或宽限期。
-同义词和检索分数不进入法律判断；模型对照必须先经原文校验和人工复核。
+同义词和检索分数不进入法律判断；模型复核须通过出处、覆盖和输入绑定校验。
 """
 
 from __future__ import annotations
@@ -39,6 +39,8 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
     if len(review_by_id) != len(reviews) or set(review_by_id) - {doc.id for doc in documents}:
         warnings.append("存在重复或不属于当前文献集的复核，不能用于判断。")
         return NoveltyDecision("insufficient_evidence", warnings)
+    model_notes = (["逐项复核由大模型完成，逐字回查不证明语义判断正确；模型复核不等于人工或专业确认。"]
+                   if any(r.review_method == "model" for r in reviews) else [])
     fully_reviewed = 0
     ordinary_count = 0
     risk_ids: list[str] = []
@@ -78,8 +80,8 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
             continue
         ordinary_count += 1
         review = review_by_id.get(doc.id)
-        if not review or not review.reviewed:
-            warnings.append(f"{doc.id}：对照尚未人工复核。")
+        if not review or not review.reviewed or review.review_method == "candidate":
+            warnings.append(f"{doc.id}：对照尚未完成逐项复核。")
             continue
         try:
             reviewed_at = datetime.fromisoformat(review.reviewed_at)
@@ -88,9 +90,17 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
             time_valid = False
         if (not review.reviewer.strip() or not time_valid
                 or review.input_hash != review_input_hash(features, doc, cutoff, review)):
-            warnings.append(f"{doc.id}：复核人、时刻或输入绑定缺失/已失效，请重新复核。")
+            warnings.append(f"{doc.id}：复核来源/执行者、时刻或输入绑定缺失/已失效，请重新复核。")
             continue
         section_ids = {s.id for s in doc.sections}
+        if review.review_method == "model" and (
+                not review.review_model.strip() or not review.review_endpoint.strip()
+                or not review.review_prompt_version.strip() or not review.completeness_basis.strip()
+                or set(review.reviewed_section_ids) != section_ids
+                or len(review.reviewed_section_ids) != len(section_ids)
+                or any(row.origin != "model" for row in review.rows)):
+            warnings.append(f"{doc.id}：模型复核来源、上下文依据或段落覆盖记录不完整。")
+            continue
         if (review.relevance not in {"related", "unrelated"} or not review.relevance_basis.strip()
                 or not review.relevance_section_ids or not set(review.relevance_section_ids) <= section_ids):
             warnings.append(f"{doc.id}：技术相关性未确认，或缺少说明及原文位置；词汇分数不能代替相关性。")
@@ -112,7 +122,7 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
             elif not row.basis.strip() or row.origin not in {"auto", "model", "human"}:
                 valid = False
             elif row.status == "disclosed":
-                # 必须是真实原文的逐字引文；真实引文是否语义支持要素，仍需人工确认。
+                # 逐字回查只是出处检查，技术含义由有来源记录的复核方判断。
                 if (not row.quote.strip() or not row.scheme_id.strip()
                         or row.quote not in sections.get(row.section_id, "")):
                     valid = False
@@ -120,7 +130,9 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
         if not valid:
             warnings.append(f"{doc.id}：存在未知要素、无效状态、缺失复核说明或无法回查的引文。")
             continue
-        if not doc.complete:
+        context_complete = (review.context_complete and (doc.complete or doc.parsed_complete)
+                            if review.review_method == "model" else doc.complete)
+        if not context_complete:
             warnings.append(f"{doc.id}：资料不完整，不能据局部摘录排除完整披露。")
             continue
         fully_reviewed += 1
@@ -135,14 +147,14 @@ def assess_novelty(features: list[Feature], documents: list[PatentDocument],
             fully_reviewed -= 1
     if risk_ids:
         return NoveltyDecision("potential_novelty_risk", [
-            "至少一篇基准日前文献经人工复核，在同一技术方案中披露全部已确认要素。",
+            "至少一篇基准日前文献经逐项复核，在同一技术方案中披露全部已确认要素。",
             "这是新颖性预筛风险提示，不能推导出完整授权结论。",
-        ], risk_ids, warnings)
+        ], risk_ids, warnings + model_notes)
     if documents and ordinary_count and fully_reviewed == ordinary_count == len(documents) and not warnings:
         return NoveltyDecision("no_complete_disclosure_found", [
             "逐篇对照后，本次已复核文献中未发现一篇完整披露全部要素的文献。",
             "未跨文献拼接；这不证明不存在其他现有技术，也不等于可以授权。",
-        ])
+        ], warnings=model_notes)
     return NoveltyDecision("insufficient_evidence", [
         "存在资料、日期、检索、要素或复核缺口，不能排除新颖性风险。",
-    ], warnings=warnings or ["没有取得可复核的文献。"])
+    ], warnings=(warnings or ["没有取得可复核的文献。"]) + model_notes)

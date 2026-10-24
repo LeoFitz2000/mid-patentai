@@ -40,22 +40,20 @@ class SynonymLexicon:
         # 一次替换避免把已替换内容再次改写；英文采用词边界，motor 不命中 motorized。
         return self._pattern.sub(lambda match: self.aliases[match.group()], value) if self._pattern else value
 
-    def expand_queries(self, query: str, limit: int = 4) -> list[str]:
-        """有界地生成原文/规范词/中英别名查询，避免同义词组合爆炸。"""
-        result = [query.strip()]
-        canonical = self.canonicalize(query)
-        if canonical not in result:
-            result.append(canonical)
-        for index in (1, -1):
-            expanded = canonical
-            for group in self.groups:
-                expanded = expanded.replace(self.aliases[self.normalize(group[0])], group[index])
-            if expanded not in result:
-                result.append(expanded)
-        return [item for item in result if item][:limit]
+    def expand_queries(self, query: str, limit: int = 4, *, profile: str = "theoretical",
+                       protected_terms: list[str] | None = None) -> list[str]:
+        """按完整术语替换，保留原句、单位大小写和限定；LLM层由独立模块显式调用。"""
+        from modules.novelty_models import Feature
+        from modules.synonym_expansion import build_expansion_plan
+        if type(limit) is not int or limit < 1:
+            raise ValueError("扩展数量须为正整数。")
+        if not query.strip():
+            return []
+        plan = build_expansion_plan([Feature("F1", query.strip())], self, profile, protected_terms)
+        return [query.strip()] + [v["query"] for v in plan["variants"]][:limit-1]
 
     def candidate_match(self, feature: str, evidence: str) -> str:
-        """只给检索提示。否定、数量和连接关系仍由整段原文与人工复核检查。"""
+        """只给检索提示。否定、数量和连接关系仍由整段原文与逐项复核检查。"""
         raw_feature = self.normalize(feature)
         raw_evidence = self.normalize(evidence)
         if raw_feature in raw_evidence:

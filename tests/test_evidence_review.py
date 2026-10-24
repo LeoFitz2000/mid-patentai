@@ -169,7 +169,7 @@ class EvidenceReviewTests(unittest.TestCase):
         payload = report_payload({"features": features, "documents": [document], "reviews": [review],
                                   "decision": decision, "trace": []}, "构造输入", "2024-01-01", [])
         markdown = to_markdown(payload)
-        self.assertEqual(payload["report_schema_version"], 2)
+        self.assertEqual(payload["report_schema_version"], 3)
         self.assertIn(review.reviewed_at, markdown)
         self.assertIn("test-alias", markdown)
         self.assertIn("权利要求1", markdown)
