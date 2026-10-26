@@ -1,0 +1,586 @@
+{
+  "schema_version": 1,
+  "dataset_id": "synonym-teaching-v1",
+  "provenance": "synthetic_teaching_fixture",
+  "reference_author_type": "author_written_teaching_labels",
+  "synonym_groups": [
+    [
+      "压力传感器",
+      "压力感测器",
+      "pressure sensor",
+      "pressure transducer"
+    ],
+    [
+      "温度传感器",
+      "温度感测器",
+      "temperature sensor"
+    ],
+    [
+      "控制器",
+      "控制单元",
+      "controller",
+      "control unit"
+    ],
+    [
+      "无线通信模块",
+      "无线通讯模块",
+      "wireless communication module",
+      "wireless communications module"
+    ],
+    [
+      "电动机",
+      "电机",
+      "electric motor"
+    ],
+    [
+      "红外发射器",
+      "红外发射单元",
+      "infrared emitter"
+    ],
+    [
+      "连接",
+      "相连",
+      "connected to",
+      "coupled to"
+    ],
+    [
+      "串联",
+      "in series"
+    ],
+    [
+      "并联",
+      "in parallel"
+    ],
+    [
+      "夹头",
+      "夹持头",
+      "chuck"
+    ],
+    [
+      "驱动轴",
+      "传动轴",
+      "drive shaft"
+    ],
+    [
+      "支架",
+      "托架",
+      "bracket"
+    ],
+    [
+      "导轨",
+      "导向轨",
+      "guide rail"
+    ],
+    [
+      "离散余弦变换",
+      "discrete cosine transform",
+      "DCT"
+    ]
+  ],
+  "scope": "4个作者编写的固定检索池，含改善、不变和变差情形；不是实际Google Patents测量",
+  "cases": [
+    {
+      "id": "engineering_new_component_name",
+      "profile": "engineering",
+      "features": [
+        {
+          "id": "F1",
+          "text": "夹头连接驱动轴"
+        }
+      ],
+      "llm_candidates": [
+        {
+          "feature_id": "F1",
+          "source": "夹头",
+          "term": "筒夹",
+          "category": "component",
+          "relation": "equivalent",
+          "language": "zh",
+          "rationale": "作者编写的模拟候选，用于工程回归，非实际模型输出"
+        },
+        {
+          "feature_id": "F1",
+          "source": "夹头",
+          "term": "紧固件",
+          "category": "component",
+          "relation": "broader",
+          "language": "zh",
+          "rationale": "作者编写的模拟候选，用于工程回归，非实际模型输出"
+        },
+        {
+          "feature_id": "F1",
+          "source": "驱动轴",
+          "term": "电动机",
+          "category": "component",
+          "relation": "related",
+          "language": "zh",
+          "rationale": "作者编写的模拟候选，用于工程回归，非实际模型输出"
+        }
+      ],
+      "approved_aliases": [
+        {
+          "feature_id": "F1",
+          "source": "夹头",
+          "term": "筒夹",
+          "category": "component",
+          "relation": "equivalent",
+          "language": "zh",
+          "rationale": "作者编写的模拟候选，用于工程回归，非实际模型输出"
+        }
+      ],
+      "relevant_ids": [
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "documents": [
+        {
+          "id": "R1",
+          "title": "夹头连接驱动轴",
+          "content": "相关装置一"
+        },
+        {
+          "id": "R2",
+          "title": "chuck coupled to drive shaft",
+          "content": "相关装置二"
+        },
+        {
+          "id": "R3",
+          "title": "夹头连接驱动轴的筒夹组件",
+          "content": "相关装置三"
+        },
+        {
+          "id": "N1",
+          "title": "夹头连接驱动轴领域的紧固件综述",
+          "content": "未披露目标关系"
+        },
+        {
+          "id": "N2",
+          "title": "夹头连接驱动轴术语索引和电动机广告",
+          "content": "不相关"
+        }
+      ],
+      "reference_complete": true,
+      "judged_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "N1",
+        "N2"
+      ],
+      "candidate_provenance": "author_written_simulated_llm_response_not_real_model",
+      "generation_cost": {
+        "llm_calls": 0
+      },
+      "results_by_query": {
+        "chuck相连驱动轴": {
+          "status": "ok",
+          "ids": [
+            "R2"
+          ],
+          "http_requests": null
+        },
+        "chuck连接驱动轴": {
+          "status": "ok",
+          "ids": [
+            "R2"
+          ],
+          "http_requests": null
+        },
+        "夹头connected to驱动轴": {
+          "status": "ok",
+          "ids": [
+            "R2"
+          ],
+          "http_requests": null
+        },
+        "夹头相连驱动轴": {
+          "status": "ok",
+          "ids": [
+            "R2"
+          ],
+          "http_requests": null
+        },
+        "夹头连接drive shaft": {
+          "status": "ok",
+          "ids": [
+            "R2"
+          ],
+          "http_requests": null
+        },
+        "夹头连接传动轴": {
+          "status": "ok",
+          "ids": [
+            "R2"
+          ],
+          "http_requests": null
+        },
+        "夹头连接电动机": {
+          "status": "ok",
+          "ids": [
+            "N1",
+            "N2"
+          ],
+          "http_requests": null
+        },
+        "夹头连接驱动轴": {
+          "status": "ok",
+          "ids": [
+            "R1"
+          ],
+          "http_requests": null
+        },
+        "夹持头相连驱动轴": {
+          "status": "ok",
+          "ids": [
+            "R2"
+          ],
+          "http_requests": null
+        },
+        "夹持头连接驱动轴": {
+          "status": "ok",
+          "ids": [
+            "R2"
+          ],
+          "http_requests": null
+        },
+        "筒夹相连驱动轴": {
+          "status": "ok",
+          "ids": [
+            "R3"
+          ],
+          "http_requests": null
+        },
+        "筒夹连接驱动轴": {
+          "status": "ok",
+          "ids": [
+            "R3"
+          ],
+          "http_requests": null
+        },
+        "紧固件连接驱动轴": {
+          "status": "ok",
+          "ids": [
+            "N1",
+            "N2"
+          ],
+          "http_requests": null
+        }
+      }
+    },
+    {
+      "id": "engineering_expansion_can_hurt",
+      "profile": "engineering",
+      "features": [
+        {
+          "id": "F1",
+          "text": "支架固定导轨"
+        }
+      ],
+      "llm_candidates": [
+        {
+          "feature_id": "F1",
+          "source": "导轨",
+          "term": "轨道",
+          "category": "component",
+          "relation": "broader",
+          "language": "zh",
+          "rationale": "作者编写的模拟候选，用于工程回归，非实际模型输出"
+        }
+      ],
+      "approved_aliases": [],
+      "relevant_ids": [
+        "R1",
+        "R2"
+      ],
+      "documents": [
+        {
+          "id": "R1",
+          "title": "bracket guide rail fixture",
+          "content": "支承装置"
+        },
+        {
+          "id": "R2",
+          "title": "导向轨安装机构",
+          "content": "支架组件"
+        },
+        {
+          "id": "N1",
+          "title": "支架固定导轨术语出现于购物索引",
+          "content": "不相关"
+        },
+        {
+          "id": "N2",
+          "title": "支架固定导轨名词出现在引用文献目录",
+          "content": "不相关"
+        }
+      ],
+      "reference_complete": true,
+      "judged_ids": [
+        "R1",
+        "R2",
+        "N1",
+        "N2"
+      ],
+      "candidate_provenance": "author_written_simulated_llm_response_not_real_model",
+      "generation_cost": {
+        "llm_calls": 0
+      },
+      "results_by_query": {
+        "bracket固定guide rail": {
+          "status": "ok",
+          "ids": [
+            "N1",
+            "N2"
+          ],
+          "http_requests": null
+        },
+        "bracket固定导向轨": {
+          "status": "ok",
+          "ids": [
+            "N1",
+            "N2"
+          ],
+          "http_requests": null
+        },
+        "bracket固定导轨": {
+          "status": "ok",
+          "ids": [
+            "N1",
+            "N2"
+          ],
+          "http_requests": null
+        },
+        "托架固定guide rail": {
+          "status": "ok",
+          "ids": [
+            "N1",
+            "N2"
+          ],
+          "http_requests": null
+        },
+        "托架固定导向轨": {
+          "status": "ok",
+          "ids": [
+            "N1",
+            "N2"
+          ],
+          "http_requests": null
+        },
+        "托架固定导轨": {
+          "status": "ok",
+          "ids": [
+            "N1",
+            "N2"
+          ],
+          "http_requests": null
+        },
+        "支架固定guide rail": {
+          "status": "ok",
+          "ids": [
+            "N1",
+            "N2"
+          ],
+          "http_requests": null
+        },
+        "支架固定导向轨": {
+          "status": "ok",
+          "ids": [
+            "N1",
+            "N2"
+          ],
+          "http_requests": null
+        },
+        "支架固定导轨": {
+          "status": "ok",
+          "ids": [
+            "R1",
+            "R2"
+          ],
+          "http_requests": null
+        },
+        "支架固定轨道": {
+          "status": "ok",
+          "ids": [
+            "N1",
+            "N2"
+          ],
+          "http_requests": null
+        }
+      }
+    },
+    {
+      "id": "theoretical_preserve_named_method",
+      "profile": "theoretical",
+      "features": [
+        {
+          "id": "F1",
+          "text": "采用 Kalman 滤波估计状态"
+        }
+      ],
+      "protected_terms": [
+        "Kalman"
+      ],
+      "llm_candidates": [
+        {
+          "feature_id": "F1",
+          "source": "Kalman",
+          "term": "贝叶斯",
+          "category": "term",
+          "relation": "related",
+          "language": "zh",
+          "rationale": "作者编写的模拟候选，用于工程回归，非实际模型输出"
+        },
+        {
+          "feature_id": "F1",
+          "source": "Kalman",
+          "term": "卡尔曼",
+          "category": "term",
+          "relation": "equivalent",
+          "language": "zh",
+          "rationale": "作者编写的模拟候选，用于工程回归，非实际模型输出"
+        }
+      ],
+      "approved_aliases": [],
+      "relevant_ids": [
+        "R1"
+      ],
+      "documents": [
+        {
+          "id": "R1",
+          "title": "采用 Kalman 滤波估计状态",
+          "content": "方法"
+        },
+        {
+          "id": "N1",
+          "title": "采用 滤波估计状态",
+          "content": "不同算法"
+        }
+      ],
+      "reference_complete": true,
+      "judged_ids": [
+        "R1",
+        "N1"
+      ],
+      "candidate_provenance": "author_written_simulated_llm_response_not_real_model",
+      "generation_cost": {
+        "llm_calls": 0
+      },
+      "results_by_query": {
+        "采用 Kalman 滤波估计状态": {
+          "status": "ok",
+          "ids": [
+            "R1"
+          ],
+          "http_requests": null
+        },
+        "采用 卡尔曼 滤波估计状态": {
+          "status": "ok",
+          "ids": [
+            "N1"
+          ],
+          "http_requests": null
+        },
+        "采用 贝叶斯 滤波估计状态": {
+          "status": "ok",
+          "ids": [
+            "N1"
+          ],
+          "http_requests": null
+        }
+      }
+    },
+    {
+      "id": "theoretical_known_acronym",
+      "profile": "theoretical",
+      "features": [
+        {
+          "id": "F1",
+          "text": "使用离散余弦变换压缩图像"
+        }
+      ],
+      "llm_candidates": [
+        {
+          "feature_id": "F1",
+          "source": "离散余弦变换",
+          "term": "DCT",
+          "category": "term",
+          "relation": "equivalent",
+          "language": "abbr",
+          "rationale": "作者编写的模拟候选，用于工程回归，非实际模型输出"
+        },
+        {
+          "feature_id": "F1",
+          "source": "离散余弦变换",
+          "term": "变换",
+          "category": "term",
+          "relation": "broader",
+          "language": "zh",
+          "rationale": "作者编写的模拟候选，用于工程回归，非实际模型输出"
+        }
+      ],
+      "approved_aliases": [],
+      "relevant_ids": [
+        "R1",
+        "R2"
+      ],
+      "documents": [
+        {
+          "id": "R1",
+          "title": "使用离散余弦变换压缩图像",
+          "content": "方法一"
+        },
+        {
+          "id": "R2",
+          "title": "discrete cosine transform 图像压缩",
+          "content": "方法二"
+        },
+        {
+          "id": "N1",
+          "title": "使用变换压缩图像",
+          "content": "不同技术"
+        }
+      ],
+      "reference_complete": true,
+      "judged_ids": [
+        "R1",
+        "R2",
+        "N1"
+      ],
+      "candidate_provenance": "author_written_simulated_llm_response_not_real_model",
+      "generation_cost": {
+        "llm_calls": 0
+      },
+      "results_by_query": {
+        "使用DCT压缩图像": {
+          "status": "ok",
+          "ids": [
+            "R2"
+          ],
+          "http_requests": null
+        },
+        "使用discrete cosine transform压缩图像": {
+          "status": "ok",
+          "ids": [
+            "R2"
+          ],
+          "http_requests": null
+        },
+        "使用变换压缩图像": {
+          "status": "ok",
+          "ids": [
+            "N1"
+          ],
+          "http_requests": null
+        },
+        "使用离散余弦变换压缩图像": {
+          "status": "ok",
+          "ids": [
+            "R1"
+          ],
+          "http_requests": null
+        }
+      }
+    }
+  ]
+}

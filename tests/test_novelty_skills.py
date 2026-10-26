@@ -170,7 +170,7 @@ class SourceAndModelBoundaryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             model_suggest_rows(inputs["features"], inputs["documents"], client, True)
 
-    def test_model_suggestions_always_require_human_review(self):
+    def test_model_suggestions_never_count_as_completed_review(self):
         inputs = case_inputs(dataset()["cases"][0])
         client = Mock()
         rows = [as_row(feature) for feature in inputs["features"]]

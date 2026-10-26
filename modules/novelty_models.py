@@ -1,4 +1,4 @@
-"""新颖性链路的数据契约：原文、候选匹配与人工复核分开保存。"""
+"""新颖性链路的数据契约：原文、候选、模型复核与历史人工复核分开保存。"""
 
 from __future__ import annotations
 
@@ -142,15 +142,26 @@ class DocumentReview:
     relevance: str = "unknown"  # related / unrelated / unknown; never inferred from lexical score.
     relevance_basis: str = ""
     relevance_section_ids: tuple[str, ...] = ()
+    # 默认 human 兼容旧记录；模型复核必须显式记录来源，不能伪装人工确认。
+    review_method: str = "human"
+    review_model: str = ""
+    review_endpoint: str = ""
+    review_prompt_version: str = ""
+    context_complete: bool = False
+    completeness_basis: str = ""
+    reviewed_section_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        for key in ("reviewer", "reviewed_at", "input_hash", "same_scheme_basis", "relevance", "relevance_basis"):
+        for key in ("reviewer", "reviewed_at", "input_hash", "same_scheme_basis", "relevance", "relevance_basis",
+                    "review_method", "review_model", "review_endpoint", "review_prompt_version", "completeness_basis"):
             value = getattr(self, key)
             if value is None:
                 object.__setattr__(self, key, "")
             elif not isinstance(value, str):
                 raise ValueError(f"复核记录的 {key} 必须是文本。")
-        for key in ("scheme_section_ids", "relevance_section_ids"):
+        if self.review_method not in {"human", "model", "candidate"} or type(self.context_complete) is not bool:
+            raise ValueError("复核来源或上下文完整性字段无效。")
+        for key in ("scheme_section_ids", "relevance_section_ids", "reviewed_section_ids"):
             value = getattr(self, key)
             if value is None:
                 object.__setattr__(self, key, ())
@@ -172,6 +183,13 @@ def review_input_hash(features: list[Feature], document: PatentDocument, cutoff:
                       review: DocumentReview) -> str:
     data = asdict(review)
     data.pop("input_hash")
+    # 旧人工记录沿用原哈希；新的模型字段全部绑定，修改模型或上下文判定会失效。
+    defaults = {"review_method": "human", "review_model": "", "review_endpoint": "",
+                "review_prompt_version": "", "context_complete": False,
+                "completeness_basis": "", "reviewed_section_ids": ()}
+    if all(getattr(review, key) == value for key, value in defaults.items()):
+        for key in defaults:
+            data.pop(key)
     raw = json.dumps({"features": [asdict(f) for f in features], "cutoff": cutoff,
                       "snapshot_hash": document.snapshot_hash, "review": data},
                      ensure_ascii=False, sort_keys=True)
@@ -180,9 +198,11 @@ def review_input_hash(features: list[Feature], document: PatentDocument, cutoff:
 
 def stamp_review(review: DocumentReview, features: list[Feature],
                  document: PatentDocument, cutoff: str) -> DocumentReview:
-    """Record an actual submission; callers must not use this for AI suggestions."""
+    """绑定已完成的复核；模型建议不得调用，模型终审须显式标记 review_method=model。"""
     if not review.reviewed:
         return replace(review, reviewed_at="", input_hash="")
+    if review.review_method == "candidate":
+        raise ValueError("候选建议不能直接提交为已完成复核。")
     stamped = replace(review, reviewer=review.reviewer.strip(),
                       reviewed_at=datetime.now(timezone.utc).isoformat(), input_hash="")
     return replace(stamped, input_hash=review_input_hash(features, document, cutoff, stamped))

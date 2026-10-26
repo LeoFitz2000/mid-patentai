@@ -1,11 +1,11 @@
-"""新颖性界面：检索/粘贴原文 → 候选对照 → 人工复核 → 有边界的预筛报告。"""
+"""新颖性界面：检索/粘贴原文 → 候选对照 → 大模型逐项复核 → 有边界的预筛报告。"""
 
 from __future__ import annotations
 
 import hashlib
 import json
 import os
-from dataclasses import asdict, replace
+from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -18,10 +18,13 @@ from modules.llm_client import LLMClient
 from modules.material_cases import reference, save_result
 from modules.material_ui import cases_root, render_material_intake
 from modules.novelty_matching import SynonymLexicon
-from modules.novelty_models import DocumentReview, EvidenceRow, review_content, stamp_review
-from modules.novelty_review import adopt_candidate_quotes, edited_review_rows, empty_review_rows
+from modules.novelty_review import MODEL_REVIEW_PROMPT_VERSION, model_review_documents, model_review_payload
+from modules.novelty_rules import assess_novelty
 from modules.novelty_report import report_payload, to_markdown
-from skills.langgraph_skill import NoveltyHarness, model_suggest_rows
+from modules.synonym_ui import render_synonym_expansion
+from modules.candidate_ui import render_candidate_tools, render_increment
+from modules.candidate_relevance import incremental_summary, valid_body_review, model_endpoint
+from skills.langgraph_skill import NoveltyHarness
 
 
 def fingerprint(*items: str) -> str:
@@ -36,7 +39,7 @@ def main() -> None:
     with st.sidebar:
         st.header("检索与模型设置")
         max_documents = st.slider("最多获取文献数", 1, 10, 4)
-        api_key = st.text_input("模型 API Key（可选）", value=os.getenv("LLM_API_KEY", ""), type="password")
+        api_key = st.text_input("模型 API Key", value=os.getenv("LLM_API_KEY", ""), type="password")
         base_url = st.text_input("模型 API 地址", value=os.getenv("LLM_BASE_URL", "https://api.deepseek.com"))
         model = st.text_input("模型名", value=os.getenv("LLM_MODEL", "deepseek-flash"))
         with st.expander("补充领域同义词"):
@@ -70,11 +73,12 @@ def main() -> None:
     feature_text = st.text_area("确认待判断的技术要素（每行一个）", height=130,
                                 key="feature_text_input",
                                 placeholder="压力传感器\n压力传感器连接控制器\n控制器通过无线通信模块发送数据")
+    expansion = render_synonym_expansion(feature_text, lexicon, api_key, base_url, model)
     cutoff = st.date_input("判断基准日", value=datetime.now(ZoneInfo("Asia/Shanghai")).date()).isoformat()
     query = st.text_input("Google Patents 检索词（可选）")
-    st.caption("留空时逐要素查询，再补充同义词；最多8条，每条最多400字，不截断。自定义检索词覆盖范围另行记录。")
+    st.caption("留空时原要素优先，再发送审核通过的扩展；理论类最多8条、工程类最多16条，每条400字，不截断。自定义词保持指定范围。")
     st.caption("先按整套要素评估，不区分独立/从属权利要求。基准日及优先权适用性由你确认。")
-    st.info("检索会把检索词发送到 Google Patents。只有另行确认后，选定要素和原文才会发送到模型。")
+    st.info("检索词发送到 Google Patents。分别确认并点击生成术语或模型复核后，对应的要素/术语表或原文/候选才发送到模型。")
     prepared = st.session_state.get("prepared_material_features")
     material_context = {"material_unknowns": list(prepared.get("unknowns", [])) if prepared else [],
                         "material_warnings": list(prepared.get("warnings", [])) if prepared else []}
@@ -85,6 +89,7 @@ def main() -> None:
                          **material_context}
     signature = fingerprint(invention, feature_text, cutoff, query, str(max_documents),
                             json.dumps(lexicon.groups, ensure_ascii=False),
+                            json.dumps(expansion, ensure_ascii=False, sort_keys=True),
                             json.dumps(material_identity, ensure_ascii=False, sort_keys=True))
     harness = NoveltyHarness(lexicon=lexicon, max_documents=max_documents)
     state = st.session_state.get("novelty_state") if st.session_state.get("novelty_signature") == signature else None
@@ -93,7 +98,7 @@ def main() -> None:
         st.session_state.pop("novelty_state", None)
         try:
             with st.spinner("扩展同义词、检索文献并读取原文…"):
-                state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff, **material_context)
+                state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff, expansion=expansion, **material_context)
             st.session_state["novelty_state"] = state
             st.session_state["novelty_signature"] = signature
             st.session_state["review_epoch"] = 0
@@ -114,6 +119,7 @@ def main() -> None:
                                                   manual_filing, manual_priority, manual_complete)
                 documents = [doc for doc in (state or {}).get("documents", []) if doc.id != document.id] + [document]
                 state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff, documents=documents,
+                                    reviews=[r for r in (state or {}).get("reviews", []) if r.document_id != document.id],
                                     errors=(state or {}).get("errors", []),
                                     **({"search_audit": state["search_audit"]} if state and "search_audit" in state else {}),
                                     **material_context)
@@ -127,13 +133,14 @@ def main() -> None:
         return
 
     st.divider()
+    state = render_candidate_tools(state, harness, cutoff, material_context, api_key, base_url, model)
     st.subheader("2 · 查看原文与候选对照")
     audit = state["search_audit"]
     with st.expander("本轮检索范围与记录"):
         if audit["mode"] == "provided_snapshots":
             st.write("仅比对提供的快照；本轮未执行在线检索，不能推断检索覆盖。")
         else:
-            st.write("在线检索记录：所有计划内查询先执行，再按独立文献预算读取正文。词汇分数仅用于排序，相关性另行复核。")
+            st.write("在线检索记录：所有计划内查询先执行，再按独立文献预算读取正文。先用部件/关系与提及语境规则排序；可补充模型元数据判断，正文相关性另行复核。")
             st.dataframe([{"查询": r["id"], "要素": ", ".join(r["feature_ids"]) or "自定义范围",
                            "实际检索词": r["query"], "状态": r["status"], "返回数": r["returned_count"],
                            "开始": r["started_at"], "结束": r["finished_at"], "错误": r["error"]}
@@ -141,7 +148,10 @@ def main() -> None:
             for skipped in audit.get("skipped", []):
                 st.warning(f"未发送：{', '.join(skipped['feature_ids']) or '自定义变体'} · {skipped['reason']}")
             st.dataframe([{"公开号": c["publication_id"], "标题": c["title"], "链接": c["url"],
-                           "来自查询": ", ".join(c["query_ids"]), "词汇重合提示": c["lexical_hint"]["score"],
+                           "来自查询": ", ".join(c["query_ids"]), "召回来源": c.get("retrieval_origin", "unknown"),
+                           "词汇重合提示": c["lexical_hint"]["score"], "规则排序分": c.get("ranking_hint", {}).get("score"),
+                           "仅提及线索": c.get("ranking_hint", {}).get("mention_only_hint"),
+                           "模型元数据相关性": (c.get("metadata_relevance") or {}).get("relevance", "unknown"),
                            "正文状态": c["fetch_status"], "获取错误": c["fetch_error"]}
                           for c in audit["candidates"]], hide_index=True, width="stretch")
     for error in state.get("errors", []):
@@ -154,132 +164,84 @@ def main() -> None:
                 location = section.source_location or "旧版快照内部编号（非原文权利要求号）"
                 st.text(f"[{section.id}] {location}：{section.text}")
     if state.get("hits"):
-        st.dataframe(state["hits"], hide_index=True, width="stretch")
-    st.caption("候选匹配分数不是新颖性概率。相似术语、否定句、连接方向及数值差异都要回看原文。")
+        with st.expander("本地检索阅读线索（模型会检查全部原文）"):
+            st.dataframe(state["hits"], hide_index=True, width="stretch")
+    st.caption("本地检索帮助定位段落；模型负责理解技术含义、限定与证据支持关系。匹配分数不是新颖性概率。")
 
-    with st.expander("可选：让模型提出对照建议"):
-        options = {doc.id: doc for doc in state["documents"]}
-        selected = st.multiselect("发送给模型的文献", list(options), default=list(options)[:2], max_selections=3)
-        st.caption("模型将收到全部已确认要素及所选文献快照中的所有段落。总长度超过 5 万字时拒绝发送。")
-        consent_payload = json.dumps({"features": [asdict(f) for f in state["features"]],
-            "documents": [{"document_id": key, "sections": [asdict(s) for s in options[key].sections]}
-                          for key in selected]}, ensure_ascii=False, sort_keys=True)
-        consent_key = fingerprint(consent_payload, base_url, model)
-        consent = st.checkbox("我确认将上述要素和选定原文发送到此模型服务", key=f"model-consent-{consent_key}")
-        if st.button("生成待复核对照", disabled=not (consent and selected and api_key.strip())):
-            try:
-                with st.spinner("生成并校验原文引文…"):
-                    suggestions = model_suggest_rows(state["features"], [options[key] for key in selected],
-                                                     LLMClient(api_key, base_url, model), consent)
-                merged = {review.document_id: review for review in state["suggestions"]}
-                merged.update({review.document_id: review for review in suggestions})
-                state["suggestions"] = list(merged.values())
-                state["reviews"] = []
-                state["decision"] = harness.run(features=state["features"], cutoff=cutoff,
-                                                documents=state["documents"], errors=state.get("errors", []),
-                                                search_audit=state["search_audit"],
-                                                **material_context)["decision"]
-                st.session_state["review_epoch"] = st.session_state.get("review_epoch", 0) + 1
-            except (RuntimeError, ValueError, PermissionError) as exc:
-                st.error(str(exc))
+    st.subheader("3 · 模型建立要素—原文证据对照并复核")
+    st.caption("模型结合全部原文建立逐项对应关系，解释证据如何支持要素及全部限定，再核查相关性、同一方案和充分公开。")
+    options = {doc.id: doc for doc in state["documents"]}
+    selected = st.multiselect("待逐项复核的文献", list(options), default=list(options))
+    candidates_by_id = {review.document_id: review for review in state["suggestions"]}
+    payloads = [model_review_payload(state["features"], options[key], cutoff, candidates_by_id.get(key), state.get("hits", []))
+                for key in selected]
+    consent_payload = json.dumps(payloads, ensure_ascii=False, sort_keys=True)
+    review_signature = fingerprint(consent_payload, base_url.strip(), model.strip())
+    st.caption("每篇一次模型请求，发送全部要素、该篇全部快照及本地定位线索；未命中或低分段落仍须检查。单篇超过5万字符时整批拒绝。")
+    with st.expander("查看本轮模型将收到的内容"):
+        st.json(payloads)
+    consent = st.checkbox("我确认将上述要素、原文和候选对照发送到此模型服务",
+                          key=f"review-consent-{review_signature}")
 
-    pending_reviews = []
-    checked_documents = []
-    suggestions_by_id = {review.document_id: review for review in state["suggestions"]}
-    committed_by_id = {review.document_id: review for review in state.get("reviews", [])}
-    reviewer = st.text_input("复核人姓名或代号（自行填写）", key="reviewer_alias").strip()
-    st.caption("此处记录操作人自填身份与提交时刻，不核验姓名、资质或执业身份。")
-    for doc in state["documents"]:
-        st.markdown(f"**复核 {doc.id}**")
-        st.caption("disclosed=原文披露；not_found=本篇未找到；unknown=无法确定。同一技术方案使用相同方案编号，勿合并不同实施例。")
-        content_key = fingerprint(signature, replace(doc, complete=False).snapshot_hash,
-                                  str(st.session_state.get("review_epoch", 0)))
-        candidates = suggestions_by_id[doc.id].rows
-        with st.expander(f"候选建议（未确认） · {doc.id}"):
-            st.dataframe([asdict(row) for row in candidates], hide_index=True, width="stretch")
-        draft_key = f"review-draft-{content_key}"
-        if draft_key not in st.session_state:
-            st.session_state[draft_key] = empty_review_rows(state["features"])
-        draft_rows = st.session_state[draft_key]
-        initial_rows = [asdict(row) for row in draft_rows]
-        editor_epoch_key = f"editor-epoch-{content_key}"
-        editor_key = f"chart-{content_key}-{st.session_state.get(editor_epoch_key, 0)}"
-        edited = st.data_editor(initial_rows, hide_index=True, width="stretch", num_rows="fixed",
-            key=editor_key, disabled=["feature_id", "origin"],
-            column_config={"status": st.column_config.SelectboxColumn("披露状态", options=["disclosed", "not_found", "unknown"], required=True),
-                           "quote": st.column_config.TextColumn("逐字原文引文"),
-                           "section_id": st.column_config.TextColumn("原文位置"),
-                           "scheme_id": st.column_config.TextColumn("同一技术方案编号"),
-                           "basis": st.column_config.TextColumn("人工复核说明（状态改变时更新）"),
-                           "origin": st.column_config.TextColumn("引文来源")})
-        prior = committed_by_id.get(doc.id)
-        rows = edited_review_rows(edited, prior.rows if prior else draft_rows)
-        selected_quotes = st.multiselect(f"采纳哪些要素的候选引文 · {doc.id}",
-                                         [row.feature_id for row in candidates if row.quote.strip()],
-                                         key=f"adopt-selection-{content_key}")
-        if st.button(f"采纳所选候选引文 · {doc.id}", disabled=not selected_quotes):
-            st.session_state[draft_key] = adopt_candidate_quotes(rows, candidates, selected_quotes)
-            st.session_state[editor_epoch_key] = st.session_state.get(editor_epoch_key, 0) + 1
-            st.session_state[f"review-{content_key}"] = False
-            st.rerun()
-        sections_by_id = {section.id: section for section in doc.sections}
-        relevance = st.selectbox(f"技术相关性 · {doc.id}", ["unknown", "related", "unrelated"],
-            format_func=lambda value: {"unknown": "待核实", "related": "相关（说明技术关系）", "unrelated": "不相关（记录排除依据）"}[value],
-            key=f"relevance-{content_key}")
-        relevance_basis = st.text_area(f"相关性或排除依据 · {doc.id}", key=f"relevance-basis-{content_key}")
-        relevance_sections = st.multiselect(f"相关性依据位置 · {doc.id}", list(sections_by_id),
-            format_func=lambda key: f"{key} · {sections_by_id[key].source_location or '快照内部位置'}",
-            key=f"relevance-sections-{content_key}")
-        for row in rows:
-            if row.status in {"disclosed", "not_found"} and not row.basis.strip():
-                st.warning(f"{row.feature_id}：请填写或更新人工复核说明，旧说明不能自动沿用到新状态。")
-            section = sections_by_id.get(row.section_id)
-            if section and row.quote.strip() and row.quote.strip() == section.text.strip():
-                st.warning(f"{row.feature_id}：引文等于整段原文，请核对是否真正支持全部关系和限定。")
-        scheme_basis = st.text_area(f"同一技术方案的原文依据 · {doc.id}", key=f"scheme-basis-{content_key}")
-        scheme_sections = st.multiselect(f"同一方案依据位置 · {doc.id}", list(sections_by_id),
-            format_func=lambda key: f"{key} · {sections_by_id[key].source_location or '快照内部位置'}",
-            key=f"scheme-sections-{content_key}")
-        if doc.parsed_complete:
-            st.caption("解析器发现了权利要求和说明书；这仅是结构提示，不代表相关上下文完整。")
-        complete = st.checkbox("确认快照内容完整，已保留相关上下文", value=False, key=f"complete-{content_key}")
-        edit_signature = fingerprint(json.dumps([asdict(row) for row in rows], ensure_ascii=False),
-                                     str(complete), reviewer, scheme_basis, json.dumps(scheme_sections),
-                                     relevance, relevance_basis, json.dumps(relevance_sections))
-        last_edit_key = f"last-review-edit-{content_key}"
-        if last_edit_key in st.session_state and st.session_state[last_edit_key] != edit_signature:
-            for prefix in ("review", "scheme", "enabling"):
-                st.session_state[f"{prefix}-{content_key}"] = False
-        st.session_state[last_edit_key] = edit_signature
-        reviewed = st.checkbox("我已逐项核对披露状态与引文（not_found 仅代表本次文献未找到）", key=f"review-{content_key}")
-        same_scheme = st.checkbox("全部已披露要素属于同一技术方案，并非不同实施例的拼接", key=f"scheme-{content_key}")
-        enabling = st.checkbox("确认相关披露可实施，且同义表述的技术含义和限定一致", key=f"enabling-{content_key}")
-        pending_reviews.append(DocumentReview(doc.id, rows, reviewed, same_scheme, enabling,
-                                              reviewer=reviewer, same_scheme_basis=scheme_basis,
-                                              scheme_section_ids=tuple(scheme_sections), relevance=relevance,
-                                              relevance_basis=relevance_basis,
-                                              relevance_section_ids=tuple(relevance_sections)))
-        checked_documents.append(replace(doc, complete=complete))
+    def clear_review_result(selected_ids=None):
+        # 只撤销本轮重试的文献；其他输入有效的正文复核继续保留。
+        retained = [] if selected_ids is None else [r for r in state.get("reviews", []) if r.document_id not in selected_ids]
+        state["reviews"] = retained
+        state["decision"] = assess_novelty(state["features"], state["documents"], retained, cutoff,
+            errors=state.get("errors", []), search_audit=state["search_audit"], **material_context)
+        state["retrieval_increment"] = incremental_summary(state["features"], cutoff, state["search_audit"], state["documents"], retained)
+        st.session_state.pop("model_review_signature", None)
 
-    if st.button("3 · 根据已复核对照进行新颖性预筛"):
+    by_doc = {doc.id: doc for doc in state["documents"]}
+    invalid = {r.document_id for r in state.get("reviews", []) if
+        not valid_body_review(r, state["features"], by_doc.get(r.document_id), cutoff) or
+        (r.review_method == "model" and (r.review_model != model.strip() or r.review_endpoint != model_endpoint(base_url.strip())
+                                       or r.review_prompt_version != MODEL_REVIEW_PROMPT_VERSION))}
+    if invalid:
+        clear_review_result(invalid)
+        st.info("部分正文复核的输入、模型设置或证据对照流程已改变，旧记录已失效，请重新复核。")
+    st.caption("文献选择仅决定本次发送哪些正文；此前输入有效的复核继续保留。新增文献没有复核记录时保持未知。")
+
+    if st.button("调用大模型逐项复核并预筛", type="primary",
+                 disabled=not (consent and selected and api_key.strip())):
+        clear_review_result(set(selected))
         try:
             candidates = state["suggestions"]
-            submitted = [stamp_review(review, state["features"], doc, cutoff)
-                         for review, doc in zip(pending_reviews, checked_documents)]
-            state = harness.run(features=state["features"], cutoff=cutoff, documents=checked_documents,
-                                reviews=submitted, errors=state.get("errors", []),
-                                search_audit=state["search_audit"], **material_context)
-            state["suggestions"] = candidates
+            with st.spinner("逐篇调用模型复核并校验引文、要素和段落覆盖…"):
+                reviews = model_review_documents(state["features"], [options[key] for key in selected], cutoff,
+                    LLMClient(api_key, base_url, model), consent, candidates, evidence_hits=state.get("hits", []))
+                updated = harness.run(features=state["features"], cutoff=cutoff,
+                    documents=state["documents"], reviews=list({r.document_id: r for r in list(state.get("reviews", [])) + reviews}.values()), errors=state.get("errors", []),
+                    search_audit=state["search_audit"], **material_context)
+            updated["suggestions"] = candidates
+            state = updated
             st.session_state["novelty_state"] = state
-        except (RuntimeError, ValueError) as exc:
+            st.session_state["model_review_signature"] = review_signature
+        except (RuntimeError, ValueError, PermissionError) as exc:
             st.error(str(exc))
-    if state.get("reviews") and (
-        [review_content(review) for review in state["reviews"]] != [review_content(review) for review in pending_reviews]
-        or [doc.complete for doc in state["documents"]] != [doc.complete for doc in checked_documents]
-    ):
-        st.info("对照或复核确认已改变，请点击第 3 步重新预筛后再导出报告。")
-        return
+
+    reviews_by_id = {review.document_id: review for review in state.get("reviews", [])}
+    for doc in state["documents"]:
+        with st.expander(f"本地定位提示（供模型独立核查） · {doc.id}"):
+            st.dataframe([asdict(row) for row in candidates_by_id[doc.id].rows],
+                         hide_index=True, width="stretch")
+        review = reviews_by_id.get(doc.id)
+        if not review:
+            st.caption(f"{doc.id}：尚无有效模型复核。未选文献仍作为未复核缺口保留。")
+            continue
+        st.markdown(f"**模型建立的要素—原文证据对照 · {doc.id}**")
+        st.caption(f"模型：{review.review_model}；复核时间：{review.reviewed_at}；非人工确认。")
+        feature_texts = {feature.id: feature.text for feature in state["features"]}
+        st.dataframe([{"feature_text": feature_texts[row.feature_id], **asdict(row)} for row in review.rows], hide_index=True, width="stretch",
+            column_config={"feature_text": "技术要素", "status": "披露状态", "quote": "逐字原文引文", "section_id": "原文位置",
+                           "scheme_id": "同一技术方案编号", "basis": "模型逐项复核说明", "origin": "来源"})
+        st.write(f"技术相关性：{review.relevance}；{review.relevance_basis}")
+        st.write(f"同一技术方案：{review.same_scheme_confirmed}；{review.same_scheme_basis}")
+        st.write(f"充分公开：{review.enabling_disclosure_confirmed}；模型上下文完整性判断：{review.context_complete}")
+        st.caption(f"上下文依据：{review.completeness_basis}；解析结构提示：{doc.parsed_complete}。")
+
     st.divider()
+    render_increment(state)
     st.subheader("预筛结果")
     decision = state["decision"]
     st.write(f"**{decision.text}**")

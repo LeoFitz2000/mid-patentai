@@ -29,8 +29,12 @@ class LLMClient:
         self.model = model.strip()
         self.post = post
         self.sleep = sleep
+        self.last_usage = None
+        self.last_request_count = 0
 
     def complete(self, system: str, user: str, max_tokens: int = 1800) -> str:
+        self.last_usage = None
+        self.last_request_count = 0
         payload = {
             "model": self.model,
             "messages": [
@@ -44,12 +48,19 @@ class LLMClient:
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
         for attempt in range(2):
             try:
+                self.last_request_count += 1
                 response = self.post(self.url, headers=headers, json=payload, timeout=(5, 90))
                 if response.status_code in {429, 500, 502, 503, 504} and attempt == 0:
                     self.sleep(1)
                     continue
                 response.raise_for_status()
-                choice = response.json()["choices"][0]
+                data = response.json()
+                usage = data.get("usage", {})
+                if isinstance(usage, dict):
+                    self.last_usage = {key: value for key, value in usage.items()
+                                       if key in {"prompt_tokens", "completion_tokens", "total_tokens"}
+                                       and type(value) is int and value >= 0} or None
+                choice = data["choices"][0]
                 if choice.get("finish_reason") == "length":
                     raise RuntimeError("模型输出被截断；请缩短输入后重试。")
                 content = choice["message"]["content"]

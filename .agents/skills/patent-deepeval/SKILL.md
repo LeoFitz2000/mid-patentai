@@ -14,6 +14,7 @@ description: 运行本 Harness 三个 skill 的离线基础 eval，检查新颖�
 - 当前案例明确标记为教学合成题，不可计为真实专利金标准。新增真实题需记录来源快照、基准日、要素、引用与专业标注，并隔离盲测集。
 - 分组工程回归使用 `python tools/run_verification.py --output-dir 新目录`，当前工程与旧模块兼容测试分列；内部重复调用的34条合成eval不与测试数相加。
 - 真实来源比较另用 `python tools/run_real_patent_eval.py --source-dir 来源目录 --output-dir 新目录`；只有 `--fetch-sources` 才访问两篇公开页面，默认显式快照离线比较。真实运行没有合格独立参考时，漏报/误放为null，不能写0或声称专业正确率。AI草案不改名为人工参考，不预设原方案risk、变更版未发现。详见 `docs/real-evaluation.md`。
+- 排序变化用 `python tools/run_synonym_eval.py --compare-rankers --k 3` 固定查询/返回池/成本作旧新对照，同时检查新增相关/不相关及新增相关@K。排序恢复与新增召回分开；元数据/正文模型判断不是独立金标准。规则、引用校验、失败回退、追加正文及保留既有有效复核另运行 `tests.test_candidate_relevance`、`tests.test_candidate_ui`、`tests.test_ranking_evaluation`。
 - 修改模型、提示词、术语表、规则或检索后重跑；失败返回非零退出状态，不删除失败案例以提高分数。
 - 基础 eval：`python -m unittest tests.test_novelty_skills.DeepEvalSkillEvals -v`。
 

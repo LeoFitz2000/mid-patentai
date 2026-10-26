@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import time
 from copy import deepcopy
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -11,8 +12,12 @@ from datetime import datetime, timezone
 from modules.novelty_matching import SynonymLexicon
 from modules.novelty_models import Feature, google_patent_url
 from modules.patent_search import MAX_QUERY_LENGTH
+from modules.synonym_expansion import PROFILES, build_expansion_plan, feature_hash
+from modules.candidate_ranking import RANKING_VERSION, rank_candidates
+from modules.candidate_relevance import annotate_origins
 
 MAX_QUERIES = 8
+MAX_QUERY_BUDGET = 16
 RESULTS_PER_QUERY = 5
 
 
@@ -26,12 +31,20 @@ def search_input_hash(features: list[Feature], cutoff: str) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def query_plan(features: list[Feature], query: str, lexicon: SynonymLexicon) -> dict:
+def query_plan(features: list[Feature], query: str, lexicon: SynonymLexicon, expansion: dict | None = None) -> dict:
     """Each original feature gets priority over variants. Never shorten a feature."""
     query = query.strip()
     if len(query) > MAX_QUERY_LENGTH:
         raise ValueError("专利检索词超过 400 字，请拆分查询；不会静默截断。")
-    plan = {"query_mode": "user_query" if query else "per_feature", "queries": [], "skipped": []}
+    if expansion is not None and expansion.get("feature_hash") != feature_hash(features):
+        raise ValueError("同义词扩展与当前要素不匹配，请重新生成或审核。")
+    # 重新按规则构建，不信任外部JSON中已填好的variants、状态或查询预算。
+    expansion = build_expansion_plan(features, lexicon, (expansion or {}).get("profile", "theoretical"),
+        (expansion or {}).get("protected_terms"), (expansion or {}).get("generation"),
+        (expansion or {}).get("approved_candidate_ids"))
+    budget = expansion["policy"]["query_budget"]
+    plan = {"query_mode": "user_query" if query else "per_feature", "queries": [], "skipped": [],
+            "query_budget": budget, "expansion": expansion}
     sources = [([], query)] if query else [([f.id], f.text) for f in features]
     seen: set[str] = set()
 
@@ -44,7 +57,7 @@ def query_plan(features: list[Feature], query: str, lexicon: SynonymLexicon) -> 
             return
         seen.add(text)
         reason = "超过400字，未发送且未截断" if len(text) > MAX_QUERY_LENGTH else (
-            "已达到8条查询预算，未发送" if len(plan["queries"]) >= MAX_QUERIES else "")
+            f"已达到{budget}条查询预算，未发送" if len(plan["queries"]) >= budget else "")
         if reason:
             plan["skipped"].append({"feature_ids": ids, "query": text, "kind": kind, "reason": reason})
         else:
@@ -53,15 +66,14 @@ def query_plan(features: list[Feature], query: str, lexicon: SynonymLexicon) -> 
 
     for ids, text in sources:
         add(ids, text, "original")
-    # A case-only variant adds no useful recall. Original queries remain exact:
-    # mW and MW must never be merged into one feature-coverage record.
-    variants = [(ids, [variant for variant in lexicon.expand_queries(text)[1:]
-                       if lexicon.normalize(variant) != lexicon.normalize(text)])
-                for ids, text in sources if len(text) <= MAX_QUERY_LENGTH]
-    for index in range(3):
-        for ids, texts in variants:
-            if index < len(texts):
-                add(ids, texts[index], "synonym_variant")
+    # 自定义词保留用户指定范围，不偷偷把整套要素或LLM候选附加进去。
+    if not query:
+        variants = [[v for v in expansion["variants"] if v["feature_id"] == f.id] for f in features]
+        for index in range(expansion["policy"]["variants_per_feature"]):
+            for texts in variants:
+                if index < len(texts):
+                    value = texts[index]
+                    add([value["feature_id"]], value["query"], value["kind"])
     return plan
 
 
@@ -82,11 +94,12 @@ def lexical_hint(features: list[Feature], text: str, lexicon: SynonymLexicon) ->
 
 
 def retrieve_with_journal(features: list[Feature], cutoff: str, query: str, lexicon: SynonymLexicon,
-                          searcher, fetcher, max_documents: int) -> tuple[list, dict]:
+                          searcher, fetcher, max_documents: int, expansion: dict | None = None) -> tuple[list, dict]:
+    started = time.perf_counter()
     audit = {"schema_version": 1, "mode": "online", "input_hash": search_input_hash(features, cutoff),
              "started_at": now(), "query_budget": MAX_QUERIES, "results_per_query": RESULTS_PER_QUERY,
              "document_budget": max_documents, "synonym_groups": deepcopy(lexicon.groups),
-             **query_plan(features, query, lexicon), "candidates": []}
+             **query_plan(features, query, lexicon, expansion), "candidates": []}
     candidates: dict[str, dict] = {}
     for record in audit["queries"]:
         record.update(started_at=now(), status="error", results=[], returned_count=0, error="")
@@ -95,7 +108,7 @@ def retrieve_with_journal(features: list[Feature], cutoff: str, query: str, lexi
             if not isinstance(raw, list):
                 raise ValueError("检索器未返回文献列表。")
             record["returned_count"] = len(raw)
-            for item in raw[:RESULTS_PER_QUERY]:
+            for result_rank, item in enumerate(raw[:RESULTS_PER_QUERY], 1):
                 if not isinstance(item, dict):
                     record["results"].append({"validation_error": "检索结果不是文献对象"})
                     continue
@@ -106,7 +119,13 @@ def retrieve_with_journal(features: list[Feature], cutoff: str, query: str, lexi
                     result["publication_id"] = pub_id
                     candidate = candidates.setdefault(pub_id, {**result, "query_ids": [],
                         "lexical_hint": lexical_hint(features, result["title"] + " " + result["content"], lexicon),
-                        "fetch_status": "not_selected", "fetch_error": ""})
+                        "fetch_status": "not_selected", "fetch_error": "", "observations": []})
+                    observed_hint = lexical_hint(features, result["title"] + " " + result["content"], lexicon)
+                    candidate["observations"].append({"id": f"{record['id']}:{result_rank}",
+                        "query_id": record["id"], "query_kind": record["kind"], "rank": result_rank,
+                        "title": result["title"], "content": result["content"], "lexical_hint": observed_hint})
+                    if observed_hint["score"] > candidate["lexical_hint"]["score"]:
+                        candidate["lexical_hint"] = observed_hint
                     if record["id"] not in candidate["query_ids"]:
                         candidate["query_ids"].append(record["id"])
                 except ValueError as exc:
@@ -117,7 +136,15 @@ def retrieve_with_journal(features: list[Feature], cutoff: str, query: str, lexi
             record["error"] = str(exc)
         record["finished_at"] = now()
     # All planned queries run before any page budget can stop fetching.
-    ordered = sorted(candidates.values(), key=lambda c: c["lexical_hint"]["score"], reverse=True)
+    legacy = sorted(candidates.values(), key=lambda c: c["lexical_hint"]["score"], reverse=True)
+    for index, candidate in enumerate(legacy, 1):
+        candidate["legacy_lexical_rank"] = index
+    annotate_origins(legacy, audit, features)
+    ordered = rank_candidates(features, list(candidates.values()), lexicon, audit["expansion"])
+    for index, candidate in enumerate(ordered, 1):
+        candidate["rank"] = index
+    audit["ranking"] = {"version": RANKING_VERSION, "mode": "rules", "metadata_reviews": {},
+        "note": "组件、关系与提及语境的规则线索；未进行正文相关性或新颖性确认"}
     documents = []
     for candidate in ordered[:max_documents]:
         candidate["fetch_started_at"] = now()
@@ -134,6 +161,11 @@ def retrieve_with_journal(features: list[Feature], cutoff: str, query: str, lexi
         candidate["fetch_finished_at"] = now()
     audit["candidates"] = ordered
     audit["finished_at"] = now()
+    audit["retrieval_cost"] = {"search_calls": len(audit["queries"]),
+        "page_attempts": len(ordered[:max_documents]), "successful_pages": len(documents),
+        "returned_hits": sum(r["returned_count"] for r in audit["queries"]), "unique_candidates": len(ordered),
+        "elapsed_seconds": round(time.perf_counter() - started, 6),
+        "expansion_generation_cost": audit["expansion"]["generation"].get("cost", {})}
     return documents, audit
 
 
@@ -153,8 +185,20 @@ def search_warnings(audit: dict | None, features: list[Feature], cutoff: str) ->
         return []
     warnings = []
     queries = audit.get("queries", [])
-    if not queries or len(queries) > MAX_QUERIES:
+    profile = audit.get("expansion", {}).get("profile", "theoretical")
+    budget = PROFILES.get(profile, {}).get("query_budget", MAX_QUERIES)
+    if (profile not in PROFILES or not queries or len(queries) > budget
+            or budget > MAX_QUERY_BUDGET or audit.get("query_budget", MAX_QUERIES) != budget):
         warnings.append("在线检索缺少有效的有界查询记录。")
+    expansion = audit.get("expansion", {})
+    if expansion and expansion.get("feature_hash") != feature_hash(features):
+        warnings.append("同义词扩展与当前要素不匹配，不能沿用。")
+    if expansion.get("generation", {}).get("status") == "error":
+        warnings.append("LLM扩展失败，仅使用词典；失败与成本记录已保留。")
+    if any(c.get("status") == "pending" for c in expansion.get("candidates", [])):
+        warnings.append("存在未审核的LLM候选，未用于查询，不能据此宣称扩展充分。")
+    if audit.get("ranking", {}).get("status") == "error":
+        warnings.append("候选模型判断失败，已回退规则排序；相关性仍须正文复核。")
     if audit.get("query_mode") != "per_feature":
         warnings.append("使用自定义检索词，逐要素检索覆盖尚未确认。")
     covered = set()
