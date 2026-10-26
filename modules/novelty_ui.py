@@ -18,13 +18,15 @@ from modules.llm_client import LLMClient
 from modules.material_cases import reference, save_result
 from modules.material_ui import cases_root, render_material_intake
 from modules.novelty_matching import SynonymLexicon
-from modules.novelty_review import MODEL_REVIEW_PROMPT_VERSION, model_review_documents, model_review_payload
-from modules.novelty_rules import assess_novelty
-from modules.novelty_report import report_payload, to_markdown
+from modules.novelty_review import MODEL_REVIEW_PROMPT_VERSION, model_review_payload
+from modules.novelty_report import to_markdown
+from skills.report_delivery_skill import run as deliver_report
 from modules.synonym_ui import render_synonym_expansion
 from modules.candidate_ui import render_candidate_tools, render_increment
-from modules.candidate_relevance import incremental_summary, valid_body_review, model_endpoint
-from skills.langgraph_skill import NoveltyHarness
+from modules.candidate_relevance import valid_body_review, model_endpoint
+from skills.precheck_skill import NoveltyHarness
+from modules.semantic_eval_ui import render_semantic_evaluation
+from skills.evidence_alignment_skill import review as run_evidence_review
 
 
 def fingerprint(*items: str) -> str:
@@ -35,7 +37,7 @@ def main() -> None:
     load_dotenv(Path(__file__).parents[1] / ".env")
     st.set_page_config(page_title="Google Patents 新颖性预筛", page_icon="🔎", layout="wide")
     st.title("🔎 Google Patents 新颖性预筛")
-    st.caption("CNIPA 新颖性规则 · 逐篇证据对照 · 同义词召回 · 每个 skill 都有基础 eval")
+    st.caption("专利预筛主 skill · 六个业务子 skill · 独立六维语义 eval")
     with st.sidebar:
         st.header("检索与模型设置")
         max_documents = st.slider("最多获取文献数", 1, 10, 4)
@@ -45,17 +47,17 @@ def main() -> None:
         with st.expander("补充领域同义词"):
             extra_synonyms = st.text_area("每行一组，用 | 分隔", placeholder="术语甲 | 同义术语 | English term")
             st.caption("用于检索召回和候选定位，不代表法律等同。优先添加具体领域、含义一致的术语。")
-        if st.button("运行三个 skill 的基础 eval"):
+        if st.button("检查语义 eval 契约（离线）"):
             try:
-                from skills.deepeval_skill import run_basic_evals
-                with st.spinner("运行离线合成回归…"):
-                    st.session_state["basic_eval_report"] = run_basic_evals()
+                from modules.semantic_eval_examples import contract_demo
+                with st.spinner("检查离线契约示例…"):
+                    st.session_state["basic_eval_report"] = contract_demo()
             except (RuntimeError, ValueError) as exc:
                 st.error(str(exc))
         if "basic_eval_report" in st.session_state:
             evaluation = st.session_state["basic_eval_report"]
             st.write(evaluation["summary"])
-            st.caption("这是教学合成题回归结果，不是实际专利准确率。")
+            st.caption("仅检查评估契约；没有调用语义裁判，不生成业务技能的语义验收结论。")
             st.download_button("下载基础 eval 记录", json.dumps(evaluation, ensure_ascii=False, indent=2),
                                "basic_eval.json", "application/json")
 
@@ -87,6 +89,9 @@ def main() -> None:
     material_identity = {"case": st.session_state.get("active_material_case"),
                          "preparation": prepared.get("preparation_ref") if prepared else None,
                          **material_context}
+    material_skill_context={"material_original":invention}
+    if prepared and prepared["feature_text"]==feature_text and prepared.get("skill_record"):
+        material_skill_context["material_skill_record"]=prepared["skill_record"]
     signature = fingerprint(invention, feature_text, cutoff, query, str(max_documents),
                             json.dumps(lexicon.groups, ensure_ascii=False),
                             json.dumps(expansion, ensure_ascii=False, sort_keys=True),
@@ -98,7 +103,7 @@ def main() -> None:
         st.session_state.pop("novelty_state", None)
         try:
             with st.spinner("扩展同义词、检索文献并读取原文…"):
-                state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff, expansion=expansion, **material_context)
+                state = harness.run(feature_text=feature_text, query=query, cutoff=cutoff, expansion=expansion, **material_context, **material_skill_context)
             st.session_state["novelty_state"] = state
             st.session_state["novelty_signature"] = signature
             st.session_state["review_epoch"] = 0
@@ -122,7 +127,7 @@ def main() -> None:
                                     reviews=[r for r in (state or {}).get("reviews", []) if r.document_id != document.id],
                                     errors=(state or {}).get("errors", []),
                                     **({"search_audit": state["search_audit"]} if state and "search_audit" in state else {}),
-                                    **material_context)
+                                    **material_context, **material_skill_context)
                 st.session_state["novelty_state"] = state
                 st.session_state["novelty_signature"] = signature
                 st.session_state["review_epoch"] = st.session_state.get("review_epoch", 0) + 1
@@ -186,10 +191,9 @@ def main() -> None:
     def clear_review_result(selected_ids=None):
         # 只撤销本轮重试的文献；其他输入有效的正文复核继续保留。
         retained = [] if selected_ids is None else [r for r in state.get("reviews", []) if r.document_id not in selected_ids]
-        state["reviews"] = retained
-        state["decision"] = assess_novelty(state["features"], state["documents"], retained, cutoff,
-            errors=state.get("errors", []), search_audit=state["search_audit"], **material_context)
-        state["retrieval_increment"] = incremental_summary(state["features"], cutoff, state["search_audit"], state["documents"], retained)
+        refreshed=harness.run(features=state["features"],cutoff=cutoff,documents=state["documents"],reviews=retained,
+            errors=state.get("errors",[]),search_audit=state["search_audit"],**material_context,**material_skill_context)
+        state.update(refreshed)
         st.session_state.pop("model_review_signature", None)
 
     by_doc = {doc.id: doc for doc in state["documents"]}
@@ -208,11 +212,11 @@ def main() -> None:
         try:
             candidates = state["suggestions"]
             with st.spinner("逐篇调用模型复核并校验引文、要素和段落覆盖…"):
-                reviews = model_review_documents(state["features"], [options[key] for key in selected], cutoff,
+                reviews, _ = run_evidence_review(state["features"], [options[key] for key in selected], cutoff,
                     LLMClient(api_key, base_url, model), consent, candidates, evidence_hits=state.get("hits", []))
                 updated = harness.run(features=state["features"], cutoff=cutoff,
                     documents=state["documents"], reviews=list({r.document_id: r for r in list(state.get("reviews", [])) + reviews}.values()), errors=state.get("errors", []),
-                    search_audit=state["search_audit"], **material_context)
+                    search_audit=state["search_audit"], **material_context, **material_skill_context)
             updated["suggestions"] = candidates
             state = updated
             st.session_state["novelty_state"] = state
@@ -249,7 +253,7 @@ def main() -> None:
         st.write(reason)
     for warning in decision.warnings:
         st.warning(warning)
-    payload = report_payload(state, invention, cutoff, lexicon.groups)
+    report_context = {}
     active_case = st.session_state.get("active_material_case")
     case_ready = False
     if active_case:
@@ -257,15 +261,19 @@ def main() -> None:
             current_case = reference(cases_root(), active_case["case_id"])
             if current_case != active_case:
                 raise ValueError("材料版本已变化，请重新保存并建立对照。")
-            payload["material_case"] = current_case
+            report_context["material_case"] = current_case
             prepared = st.session_state.get("prepared_material_features")
             if prepared:
-                payload["feature_preparation"] = prepared
-                payload["feature_preparation_matches_input"] = prepared["feature_text"] == feature_text
+                report_context["feature_preparation"] = prepared
+                report_context["feature_preparation_matches_input"] = prepared["feature_text"] == feature_text
             case_ready = True
         except (OSError, ValueError, KeyError, TypeError) as exc:
             st.error(str(exc))
             return
+    payload, _ = deliver_report(state, invention, cutoff, lexicon.groups, **report_context)
+    semantic_result=render_semantic_evaluation(payload["skill_records"],api_key,base_url,model)
+    if semantic_result:
+        payload["semantic_evaluation"]=semantic_result
     st.session_state["last_generated_report"] = payload
     st.download_button("下载新颖性 Markdown 报告", to_markdown(payload), "novelty_report.md", "text/markdown")
     st.download_button("下载证据快照与判断记录 JSON", json.dumps(payload, ensure_ascii=False, indent=2),

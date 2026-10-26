@@ -17,7 +17,9 @@ def rerun_with_evidence(state, harness, cutoff, material_context, *, audit, docu
     updated = harness.run(features=state["features"], cutoff=cutoff,
         documents=state["documents"] if documents is None else documents,
         reviews=state.get("reviews", []) if reviews is None else reviews,
-        search_audit=audit, errors=state.get("errors", []), **material_context)
+        search_audit=audit, errors=state.get("errors", []),
+        material_original=state.get("material_original",""),
+        **({"material_skill_record":state["material_skill_record"]} if state.get("material_skill_record") else {}), **material_context)
     prior = {review.document_id: review for review in state["suggestions"]}
     updated["suggestions"] = [prior.get(review.document_id, review) for review in updated["suggestions"]]
     return updated

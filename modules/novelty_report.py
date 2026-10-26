@@ -7,8 +7,8 @@ from datetime import datetime, timezone
 from urllib.parse import quote as url_quote
 
 
-def report_payload(state: dict, invention: str, cutoff: str, lexicon_groups: list) -> dict:
-    return {
+def build_payload(state: dict, invention: str, cutoff: str, lexicon_groups: list) -> dict:
+    payload = {
         "report_schema_version": 3,
         "created_at": datetime.now(timezone.utc).isoformat(), "task": "CN_novelty_precheck",
         "scope": "Google Patents；整套用户确认要素；不展开独立/从属权利要求",
@@ -30,9 +30,10 @@ def report_payload(state: dict, invention: str, cutoff: str, lexicon_groups: lis
                    "Google Patents 不包含全部非专利现有技术；日期、抵触申请、充分公开等仍可能需要专业核验。",
                    "模型逐项复核不等于人工确认，不能作为真实专业准确率的金标准。"],
     }
+    return payload
 
 
-def to_markdown(payload: dict) -> str:
+def to_markdown(payload: dict, *, include_skill_audit=True) -> str:
     from modules.novelty_models import LABELS
 
     lines = ["# 新颖性预筛报告", "", f"结论：**{LABELS[payload['decision']['label']]}**",
@@ -82,7 +83,7 @@ def to_markdown(payload: dict) -> str:
         lines += [f"实际检索调用：{cost.get('search_calls', '未记录')}；正文尝试：{cost.get('page_attempts', '未记录')}；"
                   f"独立候选：{cost.get('unique_candidates', '未记录')}；检索耗时秒：{cost.get('elapsed_seconds', '未记录')}",
                   f"候选生成状态：{expansion['generation']['status']}；生成成本：{expansion['generation'].get('cost', {})}",
-                  "扩展前后质量需另跑成对检索Eval；本轮在线查询不自动证明Recall/Precision改善。"]
+                  "扩展质量需独立语义eval核验术语保真、证据价值与漂移；本轮在线查询本身不证明质量改善。"]
     ranking = audit.get("ranking")
     if ranking:
         lines += ["", "## 候选排序与相关性层级", f"排序器：{ranking.get('version')}；模式：{ranking.get('mode')}；"
@@ -180,5 +181,11 @@ def to_markdown(payload: dict) -> str:
                                   "not_machine_verified": "引文未机器校验"}.get(evidence.get("quote_validation"), "引文未机器校验")
                     lines += [f"- {feature['id']}：{evidence['source']} / {evidence['location']}；{validation}；原文：{evidence['quote']}"]
             lines += [f"- 材料未知项：{item}" for item in preparation["unknowns"]]
-    lines += ["", "基础 eval 是单独的合成回归测试，不是本报告的专业正确性认证。"]
+    if include_skill_audit and payload.get("skill_records"):
+        lines += ["", "## 六个业务技能执行记录"]
+        lines += [f"- {r['skill_name']}：{r['execution']}；来源：{r['producer']}；{r['note']}" for r in payload["skill_records"]]
+    if include_skill_audit and payload.get("semantic_evaluation"):
+        from modules.semantic_eval import evaluation_markdown
+        lines += ["", evaluation_markdown(payload["semantic_evaluation"])]
+    lines += ["", "独立语义评估按术语与对象、结构与关系、逻辑与限定、语境与指称、功能与效果、评价与表达核验；模型裁判不等于人工确认。"]
     return "\n\n".join(lines)
