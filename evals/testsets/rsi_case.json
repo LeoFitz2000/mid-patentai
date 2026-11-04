@@ -1,6 +1,7 @@
 {
-  "dataset_version": "rsi-case-1.0",
+  "dataset_version": "rsi-case-1.1",
   "spec": "仿课堂作业（rsi-lab）的小型 RSI 测试：对已有专利A（CN108559503B，华中科大 Cs2AgBiBr6 制备）做一定调整生成一个副本，测试被测系统在基准日下能否检索定位到 test 集中的相关专利（含专利A）、并按本文件提供的风险等级对标打分。被测流程不得读取本文件的 label 字段。",
+  "split_note": "训练池（usage=train，12篇）：其反馈供临时skill文档迭代与采纳判断使用；锚池（usage=anchor，8篇）：每轮同样判卷对账，但从不参与任何迭代决定，只报告真实准确率（对照 rsi-lab 的锚集纪律）。锚池刻意放入唯一的中风险样本（US20170194101A1）和一篇晚公开的同材料文献（CN110408993A），检验学到的规则能否泛化。",
   "label_convention": {
     "expected_hit": "true=该候选与本副本同材料/同方法族，应当被检索并纳入判断；false=技术领域无关，不应命中",
     "prior_art_at_cutoff": "true=公开日早于基准日，构成基准日前文献；false=公开日晚于基准日，不得作为现有技术（同族更早公开版本的按 basis 说明）",
@@ -21,30 +22,30 @@
     "cutoff_note": "基准日取专利A同族A版本（CN108559503A）公开日 2018-09-21 之后一周；副本视为在该日左右完成"
   },
   "candidates": [
-    {"id": "CN108559503B", "label": {"expected_hit": true, "prior_art_at_cutoff": true, "risk": "high", "basis": "同族A版本 2018-09-21 公开（早于基准日；B版公开日 2020-07-07 在基准日后，日期链需按同族处理）；权利要求与说明书完整披露副本全部要素：X≥1 两步抗溶剂结晶、DMSO/DMF、氯苯、50-70℃溶解、20-40℃挥发扩散 → 单篇完整披露风险（高）"}},
-    {"id": "US20170194101A1", "label": {"expected_hit": true, "prior_art_at_cutoff": true, "risk": "medium", "basis": "2017-07-06 公开，早于基准日；同为金属卤化物双钙钛矿 Cs2AgBiBr6（Cs2BiAgBr6）材料，但公开的是太阳能电池吸收层/器件，未披露副本的制备方法要素 → 相关现有技术（中）"}},
-    {"id": "CN110408993A", "label": {"expected_hit": true, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2019-11-05 公开，晚于基准日 2018-10-08；同材料晶体但不得作为现有技术"}},
-    {"id": "CN111233035A", "label": {"expected_hit": true, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2020-06-05 公开，晚于基准日；同材料发光/扩散系数研究"}},
-    {"id": "CN113753951A", "label": {"expected_hit": true, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2021-12-07 公开，晚于基准日；同材料薄膜非线性光学"}},
-    {"id": "CN115863457A", "label": {"expected_hit": true, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2023-03-28 公开，晚于基准日；同材料太阳能电池薄膜"}},
-    {"id": "CN109874347A", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2019-06-11 公开，晚于基准日；且为含铅有机-无机杂化钙钛矿组成，与副本无铅全无机 Cs2AgBiBr6 制备方法无关"}},
-    {"id": "CN114732921B", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2023-03-28 公开；黄铁矿/TiO2 光催化抗菌材料，无关领域"}},
-    {"id": "CN105597728A", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "2016-05-25 公开；TiO2/钛酸铋光催化材料，不同材料不同用途，无关（低）"}},
-    {"id": "US4968168A", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "1990-11-06 公开；圆珠笔机械结构，无关（低）"}},
-    {"id": "US5944436A", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "1999-08-31 公开；发声笔，无关（低）"}},
-    {"id": "US3664335A", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "1972-05-23 公开；外科口罩，无关（低）"}},
-    {"id": "US7802572B2", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "2010-09-28 公开；透明医用口罩，无关（低）"}},
-    {"id": "US20240423306A1", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2024-12-26 公开；铜银 TENG 口罩，无关且晚于基准日"}},
-    {"id": "US20230180864A1", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2023-06-15 公开；磺化聚合物抗菌口罩，无关且晚于基准日"}},
-    {"id": "US8053972B2", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "2011-11-08 公开；量子点白光 LED（光致转换），无关（低）"}},
-    {"id": "US9793505B2", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "2017-10-17 公开；QD Vision 量子点发光器件，无关（低）"}},
-    {"id": "US20210202869A1", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2021-07-01 公开；三星无镉量子点，无关且晚于基准日"}},
-    {"id": "US9199842B2", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "2015-12-01 公开；Nanosys 量子点背光膜，无关（低）"}},
-    {"id": "US10593902B2", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2020-03-17 公开；UCF 超亮 QLED，无关且晚于基准日"}}
+    {"id": "CN108559503B", "usage": "train", "label": {"expected_hit": true, "prior_art_at_cutoff": true, "risk": "high", "basis": "同族A版本 2018-09-21 公开（早于基准日；B版公开日 2020-07-07 在基准日后，日期链需按同族处理）；权利要求与说明书完整披露副本全部要素：X≥1 两步抗溶剂结晶、DMSO/DMF、氯苯、50-70℃溶解、20-40℃挥发扩散 → 单篇完整披露风险（高）"}},
+    {"id": "US20170194101A1", "usage": "anchor", "label": {"expected_hit": true, "prior_art_at_cutoff": true, "risk": "medium", "basis": "2017-07-06 公开，早于基准日；同为金属卤化物双钙钛矿 Cs2AgBiBr6（Cs2BiAgBr6）材料，但公开的是太阳能电池吸收层/器件，未披露副本的制备方法要素 → 相关现有技术（中）"}},
+    {"id": "CN110408993A", "usage": "anchor", "label": {"expected_hit": true, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2019-11-05 公开，晚于基准日 2018-10-08；同材料晶体但不得作为现有技术"}},
+    {"id": "CN111233035A", "usage": "train", "label": {"expected_hit": true, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2020-06-05 公开，晚于基准日；同材料发光/扩散系数研究"}},
+    {"id": "CN113753951A", "usage": "train", "label": {"expected_hit": true, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2021-12-07 公开，晚于基准日；同材料薄膜非线性光学"}},
+    {"id": "CN115863457A", "usage": "train", "label": {"expected_hit": true, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2023-03-28 公开，晚于基准日；同材料太阳能电池薄膜"}},
+    {"id": "CN109874347A", "usage": "train", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2019-06-11 公开，晚于基准日；且为含铅有机-无机杂化钙钛矿组成，与副本无铅全无机 Cs2AgBiBr6 制备方法无关"}},
+    {"id": "CN114732921B", "usage": "anchor", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2023-03-28 公开；黄铁矿/TiO2 光催化抗菌材料，无关领域"}},
+    {"id": "CN105597728A", "usage": "anchor", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "2016-05-25 公开；TiO2/钛酸铋光催化材料，不同材料不同用途，无关（低）"}},
+    {"id": "US4968168A", "usage": "train", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "1990-11-06 公开；圆珠笔机械结构，无关（低）"}},
+    {"id": "US5944436A", "usage": "train", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "1999-08-31 公开；发声笔，无关（低）"}},
+    {"id": "US3664335A", "usage": "train", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "1972-05-23 公开；外科口罩，无关（低）"}},
+    {"id": "US7802572B2", "usage": "train", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "2010-09-28 公开；透明医用口罩，无关（低）"}},
+    {"id": "US20240423306A1", "usage": "train", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2024-12-26 公开；铜银 TENG 口罩，无关且晚于基准日"}},
+    {"id": "US20230180864A1", "usage": "anchor", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2023-06-15 公开；磺化聚合物抗菌口罩，无关且晚于基准日"}},
+    {"id": "US8053972B2", "usage": "train", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "2011-11-08 公开；量子点白光 LED（光致转换），无关（低）"}},
+    {"id": "US9793505B2", "usage": "anchor", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "2017-10-17 公开；QD Vision 量子点发光器件，无关（低）"}},
+    {"id": "US20210202869A1", "usage": "anchor", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2021-07-01 公开；三星无镉量子点，无关且晚于基准日"}},
+    {"id": "US9199842B2", "usage": "anchor", "label": {"expected_hit": false, "prior_art_at_cutoff": true, "risk": "low", "basis": "2015-12-01 公开；Nanosys 量子点背光膜，无关（低）"}},
+    {"id": "US10593902B2", "usage": "train", "label": {"expected_hit": false, "prior_art_at_cutoff": false, "risk": "not_prior_art", "basis": "2020-03-17 公开；UCF 超亮 QLED，无关且晚于基准日"}}
   ],
   "scoring": {
-    "hit_score": "对 expected_hit 的 F1：命中比例（召回）与误报（精确率）合成，2PR/(P+R)",
-    "level_score": "对 expected_hit=true 的 6 篇：found/relevant 判断、基准日资格判断、（基准日前文献的）风险等级判断三项全对才计对；level_score = 全对篇数 / 6",
-    "total": "0.5 × hit_score + 0.5 × level_score；与 rsi-lab 的 F 信号同位：只用于循环迭代与对账，不是语义质量分"
+    "hit_score": "对 expected_hit 的 F1：命中比例（召回）与误报（精确率）合成，2PR/(P+R)；训练池与锚池分别计算",
+    "level_score": "对池内 expected_hit=true 的候选：found/relevant、基准日资格、（基准日前文献的）风险等级三项全对才计对；level_score = 全对数 / 池内应命中数",
+    "total": "0.5 × hit_score + 0.5 × level_score；训练池分数 = 循环的 F 信号（供采纳与提词）；锚池分数只报告，不参与任何决定；与 rsi-lab 的 F 信号同位，不是语义质量分"
   }
 }
