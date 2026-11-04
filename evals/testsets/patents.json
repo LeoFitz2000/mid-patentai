@@ -179,6 +179,145 @@
         "US3664335A:abstract": {"location": "Abstract", "text": "Disposable surgical face mask comprising a flexible porous pad capable of covering the nose and the mouth of the wearer, the flexible porous pad having an inner layer of non-woven fiber material, an outer layer of non-woven fiber material, and a central layer of filter material. The three layers are stitched together along their horizontal and vertical edges. An elastic binding is secured onto each vertical edge of the flexible porous pad. The flexible porous pad has a first vertical double pleat structure and a second vertical double pleat structure. The first and second vertical double pleat structures are parallel to one another and are spaced a horizontal distance from one another."},
         "US3664335A:claim1": {"location": "Claim 1 (single claim; original typos preserved)", "text": "1. A surgical face mask, comprising: a. a generally rectangular flexible porous pad having a pair of opposed parallel horizontal edges and a pair of opposed parallel vertical edges, said pad having an inner layer and an outer layer of non-woven material and a central layer of filter material, said layers being secured together along their horizontal and vertical edges to form said flexible porous pad; b. a pair of elastic binding elements each having a relaxed length which is substantially shorter than the vertical dimension of said pad and each having a distended length substantially equal to the vertical dimension of said pad, said binding elements each being secured to a respective vertical edge of said pad while distended to said distended length thereof so that each of said vertical edges of said pad will be crimped throughout their lengths upon relaxation of said elastic binding elements; c. a pair of spaced parallel vertical pleats in said pad extending from the top horizontal edge to the bottom horizontal edge of said pad and defining, respectively, a ''''Z'''' configuration and a reversed ''''Z'''' configuration in a plane parallel to said horizontal edges, said pleats together defining therebetween a configuration adapted to be popped out into a generally C-shaped vertical cavity extending substantially from the top horizontal edge to the bottom horizontal edge of said pad and being semirigid to maintain said pad away from tHe wearer''s nose and mouth in service; and d. means for retaining said flexible porous pad over the nose and mouth of a wearer."}
       }
+    },
+    "CN111233035A": {
+      "title": "Lead-free perovskite Cs2AgBiBr6 and preparation method and method for obtaining diffusion coefficient thereof",
+      "url": "https://patents.google.com/patent/CN111233035A/en",
+      "jurisdiction": "CN",
+      "language": "zh (page shown via machine translation)",
+      "publication_date": "2020-06-05",
+      "filing_date": "2018-11-29",
+      "priority_date": "2018-11-29",
+      "assignee": "Dalian Institute of Chemical Physics, CAS",
+      "legal_status": "Pending",
+      "sections": {
+        "CN111233035A:abstract": {"location": "Abstract (machine translation)", "text": "The invention discloses a lead-free perovskite Cs2AgBiBr6And a method for preparing the same and a method for obtaining the diffusion coefficient thereof. Belonging to the field of material luminescence. Method for synthesizing lead-free perovskite Cs by adopting crystallization method2AgBiBr6. Lead-free perovskite Cs collected at low energy2AgBiBr6The fluorescent imaging light spot is normalized by extracting the light spots at different moments and then taking the intensity of the light spot at the moment 0 as a reference, so that the diameter of the light spot can be clearly seen to be enlarged, and the lead-free perovskite Cs can be observed through direct evidence2AgBiBr6The diffusion process of (1). Obtaining Cs by Gaussian fitting of fluorescence intensity2AgBiBr6By conversion to obtain Cs2AgBiBr6Mobility of (2). By fitting diffusion coefficient D at different temperatures, Cs is obtained2AgBiBr6The carrier scattering is in an optical wave scattering mode, and provides guiding significance for the research and development of the lead-free perovskite."}
+      }
+    },
+    "CN113753951A": {
+      "title": "Preparation method of Cs2AgBiBr6 double perovskite film with excellent nonlinear optical performance",
+      "url": "https://patents.google.com/patent/CN113753951A/en",
+      "jurisdiction": "CN",
+      "language": "zh (page shown via machine translation)",
+      "publication_date": "2021-12-07",
+      "filing_date": "2021-08-24",
+      "priority_date": "2021-08-24",
+      "assignee": "Tongji University",
+      "legal_status": "Pending",
+      "sections": {
+        "CN113753951A:abstract": {"location": "Abstract (machine translation)", "text": "The invention relates to a method for preparing a high-performance Cs with excellent nonlinear optical properties2AgBiBr6The preparation method of the double perovskite thin film comprises the following steps: taking Cs2AgBiBr6The crystal powder of the double perovskite is coated into a film by spin coating, and the Cs can be realized by adopting different adding ratios of silver bromide in the process of preparing the crystal powder2AgBiBr6The ordered-disordered phase change of the double perovskite thin film can adjust the nonlinear optical performance of the double perovskite thin film. Compared with the prior art, the invention controls the conversion of the ordered phase and the disordered phase by controlling the adding amount of the silver bromide raw material, and the Cs of the disordered phase2AgBiBr6The double perovskite thin film has a large number of Bi-related defects (Bi)AgThe anti-site and Br defects). The defect state can change the energy band structure of the material to adjust the nonlinear optical property of the Cs2AgBiBr6 double perovskite film, thereby proving that the Cs2AgBiBr6The potential of double perovskite thin films in optoelectronic devices. Compared with the prior art, the invention has simple process flow and operationEasy and low cost, and is expected to be produced in large scale."}
+      }
+    },
+    "CN109874347A": {
+      "title": "Perovskite, preparation method and the solar battery including perovskite",
+      "url": "https://patents.google.com/patent/CN109874347A/en",
+      "jurisdiction": "CN",
+      "language": "zh (page shown via machine translation)",
+      "publication_date": "2019-06-11",
+      "filing_date": "2016-07-18",
+      "priority_date": "2015-11-24",
+      "assignee": "Seoul National University R&DB Foundation / Global Frontier Center for Multiscale Energy Systems",
+      "legal_status": "Pending",
+      "sections": {
+        "CN109874347A:abstract": {"location": "Abstract (machine translation)", "text": "The present invention provides a kind of perovskite as shown in following formula 1 and including the electronic component of the perovskite, cation and the anion mixing of two of them or more, compared with including the cation of single kind and traditional perovskite thin film of anion, perovskite of the invention can show that improved structural stability and electrochemical properties.[formula 1] [AaBbCc]Pb[XdYeWf], wherein A, B and C are each independently organic or inorganic cation；X, Y and W is each independently as halide ion F‑、Cl‑、Br‑Or I‑；A, b and c meets the relationship of a+b+c=1,0.05≤a≤0.95,0≤b≤0.95, and 0≤c≤0.95；Also, d, e and f meets d+e+f=3,0.05≤d≤3, the relationship of 0≤e≤2.95 and 0≤f≤2.95, and condition is as b and c while when being 0, and e and f are not 0 simultaneously, and when e and f is simultaneously 0, b and c are not 0 simultaneously."}
+      }
+    },
+    "CN114732921B": {
+      "title": "Pyrite-modified titanium dioxide composite photocatalytic antibacterial material and preparation method thereof",
+      "url": "https://patents.google.com/patent/CN114732921B/en",
+      "jurisdiction": "CN",
+      "language": "zh (page shown via machine translation)",
+      "publication_date": "2023-03-28",
+      "publication_date_A": "2022-07-12",
+      "filing_date": "2022-04-28",
+      "priority_date": "2022-04-28",
+      "assignee": "Shaanxi University of Science and Technology (current: Shenzhen Sixplus Life Beauty Technology)",
+      "legal_status": "Active (granted B)",
+      "sections": {
+        "CN114732921B:abstract": {"location": "Abstract (machine translation)", "text": "The invention discloses a pyrite modified titanium dioxide composite photocatalytic antibacterial material, which is prepared from TiO 2 And FeS 2 Two components are TiO 2 With FeS 2 The mass ratio of the composite material is 1. The invention also discloses a preparation method of the pyrite modified titanium dioxide composite photocatalytic antibacterial material. The invention leads FeS to be 2 With TiO 2 The composite material combines the advantages of two materials, develops a novel photocatalytic antibacterial agent with wide photoresponse range, good biocompatibility and low cost, and is expected to resist the propagation of various bacteria in the fields of medical treatment, food, public environment and the like."}
+      }
+    },
+    "US10593902B2": {
+      "title": "Quantum dot light emitting devices (QLEDs) and method of manufacture",
+      "url": "https://patents.google.com/patent/US10593902B2/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "2020-03-17",
+      "filing_date": "2018-09-26",
+      "priority_date": "2017-09-29",
+      "assignee": "University of Central Florida Research Foundation (Dong, Chen, Wu, He)",
+      "sections": {
+        "US10593902B2:abstract": {"location": "Abstract", "text": "An ultrabright bright quantum dot light-emitting diode (QLED) device and associated method of manufacture. The QLED device includes quantum dots (QD) as emitters and a mixture of metal oxide nanoparticles and alkali metal compounds for simultaneous electron injection and hole blocking to achieve charging balance at high driving current conditions. The ultrabright QLEDs are useful for many light source applications including, but not limited to display, solid state lighting, optical sensor, phototherapy, photomedicine and photobiomedicine."}
+      }
+    },
+    "US9793505B2": {
+      "title": "Light-emitting device including quantum dots",
+      "url": "https://patents.google.com/patent/US9793505B2/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "2017-10-17",
+      "filing_date": "2010-10-02",
+      "priority_date": "2008-04-03",
+      "assignee": "QD Vision Inc (current: Samsung Research America)",
+      "sections": {
+        "US9793505B2:abstract": {"location": "Abstract", "text": "A light emitting device including an emissive material comprising quantum dots is disclosed. In one embodiment, the device includes a cathode, a layer comprising a material capable of transporting and injection electrons comprising an inorganic material, an emissive layer comprising quantum dots, a layer comprising a material capable of transporting holes, a layer comprising a hole injection material, and an anode. In certain embodiments, the hole injection material can be a p-type doped hole transport material. In certain preferred embodiments, quantum dots comprise semiconductor nanocrystals. In another aspect of the invention, there is provided a light emitting device wherein the device has an initial turn-on voltage that is not greater than 1240/λ, wherein λ represents the wavelength (nm) of light emitted by the emissive layer. Other light emitting devices and a method are disclosed."}
+      }
+    },
+    "US20230180864A1": {
+      "title": "Antimicrobial Face Mask",
+      "url": "https://patents.google.com/patent/US20230180864A1/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "2023-06-15",
+      "filing_date": "2021-04-19",
+      "priority_date": "2020-04-17",
+      "assignee": "Kraton Polymers LLC",
+      "legal_status": "Pending",
+      "sections": {
+        "US20230180864A1:abstract": {"location": "Abstract", "text": "A face mask is disclosed. The face mask includes a mask pad adapted to cover a nose and a mouth of a wearer and allows a passage of air therethrough to the wearer and restricts a passage of microbes. The mask pad has at least a surface protected by a sulfonated polymeric layer for killing at least 90% microbes within 120 minutes of contact with at least a surface of the face mask. The sulfonated polymeric layer consists essentially of a sulfonated polymer, the sulfonated polymer being selected from the group of perfluorosulfonic acid polymers, polystyrene sulfonates, sulfonated block copolymers, sulfonated polyolefins, sulfonated polyimides, sulfonated polyamides, sulfonated polyesters, sulfonated polysulfones, sulfonated polyketones, sulfonated poly(arylene ether), and mixtures thereof."}
+      }
+    },
+    "US20210202869A1": {
+      "title": "Quantum dot device and quantum dots",
+      "url": "https://patents.google.com/patent/US20210202869A1/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "2021-07-01",
+      "filing_date": "2021-03-05",
+      "priority_date": "2018-08-23",
+      "assignee": "Samsung Electronics Co Ltd",
+      "legal_status": "Granted (US11569468B2)",
+      "sections": {
+        "US20210202869A1:abstract": {"location": "Abstract", "text": "Quantum dots and electroluminescent devices including the same, wherein the quantum dots include a core including a first semiconductor nanocrystal including a zinc chalcogenide; and a shell disposed on the core, the shell including zinc, sulfur, and selenium, wherein the quantum dots have an average particle size of greater than 10 nm, wherein the quantum dots do not include cadmium, and wherein a photoluminescent peak of the quantum dots is present in a wavelength range of greater than or equal to about 430 nm and less than or equal to about 470 nm."}
+      }
+    },
+    "CN105597728A": {
+      "title": "Titanium dioxide/bismuth titanate ultrasonic enhanced photocatalyst and preparation method thereof",
+      "url": "https://patents.google.com/patent/CN105597728A/en",
+      "jurisdiction": "CN",
+      "language": "zh (page shown via machine translation)",
+      "publication_date": "2016-05-25",
+      "publication_date_B": "2018-02-06",
+      "filing_date": "2016-02-25",
+      "priority_date": "2016-02-25",
+      "assignee": "University of Electronic Science and Technology of China",
+      "legal_status": "Granted (B, Expired - Fee Related)",
+      "sections": {
+        "CN105597728A:abstract": {"location": "Abstract (machine translation)", "text": "The present invention belongs to the technical field of photocatalytic materials and particularly relates to a titanium dioxide/bismuth titanate ultrasonic enhanced photocatalyst and a preparation method thereof. A titanium dioxide and bismuth titanate heterostructure is prepared through a sol-gel method, the bismuth titanate/titanium dioxide ultrasonic enhanced photocatalyst with bismuth titanate nanoparticles and TiO2 nanoparticles loaded on the surface is obtained, the three advantages of good photocatalytic activity, good piezoelectric performance and small forbidden band width of bismuth titanate and good photocatalytic performance of nano titanium dioxide are combined, and the catalytic activity of the composite photocatalyst is greatly improved. Besides, by constructing the heterostructure where bismuth titanate and titanium dioxide are compounded, the photocatalytic performance is enhanced through the interfacial effect, a bismuth titanate built-in electric field is stimulated through ultrasonic collaboration, separation and transmission of photo-generated carriers are accelerated, generated photo-generated carriers promote photocatalytic activity of titanium dioxide and bismuth titanate, and photocatalytic activity is further improved."}
+      }
+    },
+    "US9199842B2": {
+      "title": "Quantum dot films, lighting devices, and lighting methods",
+      "url": "https://patents.google.com/patent/US9199842B2/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "2015-12-01",
+      "filing_date": "2011-11-02",
+      "priority_date": "2008-12-30",
+      "assignee": "Nanosys Inc (current: Shoei Chemical Inc)",
+      "sections": {
+        "US9199842B2:abstract": {"location": "Abstract", "text": "Light-emitting quantum dot films, quantum dot lighting devices, and quantum dot-based backlight units are provided. Related compositions, components, and methods are also described. Improved quantum dot encapsulation and matrix materials are provided. Quantum dot films with protective barriers are described. High-efficiency, high brightness, and high-color purity quantum dot-based lighting devices are also included, as well as methods for improving efficiency and optical characteristics in quantum dot-based lighting devices."}
+      }
     }
   }
 }

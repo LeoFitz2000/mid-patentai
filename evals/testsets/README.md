@@ -82,6 +82,20 @@
 - 语料为 Google Patents 页面逐字转录，机器翻译痕迹（如 `Cs (volatile organic Compounds)2AgBiBr6`、`turpentine absolute alcohol`、`tHe`）原样保留，引文核对按空白归一化，不改写任何非空白字符。
 - 十篇专利不足以覆盖全部现有技术空间；扩充语料时按 `patents.json` 现有格式增补并保持逐字核验。
 
+## RSI 案例：副本 + 20 篇候选 + 5 轮循环（rsi_case.json + rsi_loop.py）
+
+对应课堂规格“小型 RSI 构建”：对已有专利A（CN108559503B，华中科大 Cs2AgBiBr6 制备）在权利要求范围内调整参数生成**一个副本**（纯 DMSO、60℃、氯苯 1:2、30℃ 挥发——全部落在 A 的 X≥1/Y≥1/50-70℃/20-40℃ 界限内），基准日取 2018-10-08（A 族 A 版本公开日 2018-09-21 之后一周），在 20 篇候选里检验被测系统能否：①检索命中相关专利（含A，共 6 篇同材料族）；②正确排除晚于基准日的 4 篇同材料文献（日期门）；③给基准日前文献对标风险等级（A=高，Stanford=中，其余无关=低）。
+
+- `rsi_case.json`：副本描述 + 20 篇候选的隐藏标注（expected_hit / prior_art_at_cutoff / risk + basis）；被测流程不得读取。
+- `rsi_loop.py`：每轮按**临时 skill 文档**（初版只有一句笼统指令）对 20 篇候选出“相关/基准日资格/风险等级”，与隐藏标注对账打分（0.5×命中F1 + 0.5×判断全对率），失分点写回临时文档（P），分数超过历史最佳才采纳（R），默认 5 轮；临时文档只写在输出目录，**绝不修改 .agents/skills 下的既有 skill**。
+- 评分定位：与 rsi-lab 的 F 信号同位，只用于循环迭代与对账，不是语义质量分（与项目六维验收“不出分”的口径不冲突——两套各司其职）。
+- 已用 mock 模式端到端验证（脚本模拟裁判/提词器）：0.545→0.795→0.878→0.917→1.000，结果小文档写入 `.local/rsi/<时间戳>/rsi_result.md`；**mock 分数只验证机制，不代表模型能力**。真实模型跑法：
+
+```powershell
+$env:LLM_API_KEY="..."; $env:LLM_BASE_URL="..."; $env:LLM_MODEL="..."   # CLI 不自动读 .env
+.\.venv-novelty\Scripts\python.exe -X utf8 evals\testsets\rsi_loop.py --run-model --confirm-external
+```
+
 ## 后续可接
 
 1. 把 `theory_cases.json` 的 `candidate_output` 换成真实 harness 冻结记录（`skill_records`），即可用同一打分器对账真实业务输出。
