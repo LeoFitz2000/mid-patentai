@@ -1,0 +1,184 @@
+{
+  "dataset_version": "semantic-testset-corpus-1.0",
+  "corpus_note": "十篇真实公开专利，摘要/权利要求/说明书段落为 2026-11-04 从 Google Patents 页面逐字转录（空白折叠为单空格，原文的机器翻译痕迹一律保留，如 'Cs (volatile organic Compounds)2AgBiBr6'、'turpentine absolute alcohol'、'tHe'）。每篇的公开号、标题、日期与正文均对照抓取页面核对；引文核对按 policy.py 的空白归一化逐字匹配。",
+  "patents": {
+    "US4968168A": {
+      "title": "Ballpoint pen with clicking",
+      "url": "https://patents.google.com/patent/US4968168A/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "1990-11-06",
+      "filing_date": "1989-01-04",
+      "priority_date": "1989-01-04",
+      "assignee": "Individual (Hann-Tzong Chern)",
+      "sections": {
+        "US4968168A:abstract": {"location": "Abstract", "text": "This invention discloses a ballpoint pen which is capable of generating a \"click\" sound when the first tube of the pen is rotated over either of two predetermined positions. The ballpoint pen includes a first engaging member, a second engaging member, a medium tube, an ink reservoir tube, a sleeve, a compression spring, a support, and a rod. Thus, the main principle of the present invention is to cause a \"click\" sound to be produced as the ballpoint of the pen is extended or withdrawn, through the interaction of the first and second engaging members when the first tube of the pen is rotated."},
+        "US4968168A:bg-defects": {"location": "Background of the Invention", "text": "It is well known that rotatable ballpoint pens are commonly used nowadays. However, the known rotatable ballpoint pens still suffer from many defects. For example, the ballpoint of the pen tends to either not the fully extended or not be fully withdrawn, in relation to the pen case, when the pen is in use or at rest."},
+        "US4968168A:desc-intermediate": {"location": "Detailed description", "text": "The intermediate tube 10 which is sleeved within the first tube 2 has one end 32 on which is disposed a female thread 321 for accommodating the male thread 522 on the hollow rod 5, and another end 33 which is rotatably seated in the connector 8."},
+        "US4968168A:desc-toothed": {"location": "Detailed description", "text": "First engaging member 6 and second engaging member 9 are seated together by the interlocking of two annular toothed racks 61. 92, as shown in FIGS. 1 and 3."},
+        "US4968168A:desc-spring": {"location": "Detailed description", "text": "Compression spring 74 is held within sleeves 7, one end of which is engaged to connector 8 and the other end of which is engaged to the second engaging member 9, thereby biasing the second engaging member 9 to engage with the first engaging member 6."},
+        "US4968168A:desc-metal": {"location": "Detailed description", "text": "the first and second engaging members 6, 9, are preferably made of metal material to create a \"clicking\" sound."},
+        "US4968168A:desc-helical": {"location": "Another embodiment", "text": "a hollow rod 42 has a helical bar 421 protruding at its lower outer end so as to slide along helical slot 321 of the intermediate tube 20."}
+      }
+    },
+    "US5944436A": {
+      "title": "Pen possible to sound",
+      "url": "https://patents.google.com/patent/US5944436A/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "1999-08-31",
+      "filing_date": "1998-04-08",
+      "priority_date": "1998-04-08",
+      "assignee": "Hau Mei Ind Co Ltd (Tu-Tan Huang)",
+      "sections": {
+        "US5944436A:abstract": {"location": "Abstract", "text": "A pen possible to sound includes a housing, an ink holder, a fit member, a gear set, and an operative member combined together. An elastic strip is provided in an intermediate portion of the housing, and the ink holder is movably located in a lower portion of the housing. An operative member is positioned in and on the outer surface of the housing, having a rack engaging a pinion of a main gear of the gear set. If the operative member is repeatedly pushed down, the elastic strip is snapped by an eccentric gear of the gear set, giving out sounds."},
+        "US5944436A:desc-elastic-strip": {"location": "Detailed description", "text": "The securing member 2 has a circular shape, and the elastic strip 21 is formed to extend to the left side from the circular body."},
+        "US5944436A:desc-fit-u": {"location": "Detailed description", "text": "The fit member 4 has an elastic U-shaped portion 41, and a stud 42 is provided on an outer side of the elastic U-shaped portion 41 to engage or disengage from a fit hole 121 provided in the lower portion of the housing 1."},
+        "US5944436A:desc-ratchet": {"location": "Detailed description", "text": "On the contrary, if the pinion 611 is rotated counterclockwise, as shown in FIG. 6, the ratchet teeth 613 cannot engage the ratchet teeth 615 so that the large gear rotates only clockwise."},
+        "US5944436A:desc-eccentric": {"location": "Detailed description", "text": "the eccentric gear 622 rotates to snap intermittently the elastic strip 21 to produce intermittent and light-and-heavy sounds."},
+        "US5944436A:desc-repeat": {"location": "Detailed description", "text": "Thus, if the operating member 5 is pressed repeatedly, the elastic strip 21 is continued to be snapped to give out sounds."}
+      }
+    },
+    "US8053972B2": {
+      "title": "Quantum dot white and colored light-emitting devices",
+      "url": "https://patents.google.com/patent/US8053972B2/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "2011-11-08",
+      "filing_date": "2010-02-04",
+      "priority_date": "1998-04-01",
+      "assignee": "Massachusetts Institute of Technology / Philips Lumileds (Bawendi et al.)",
+      "sections": {
+        "US8053972B2:abstract": {"location": "Abstract", "text": "A light-emitting device comprising a population of quantum dots (QDs) embedded in a host matrix and a primary light source which causes the QDs to emit secondary light and a method of making such a device. The size distribution of the QDs is chosen to allow light of a particular color to be emitted therefrom. The light emitted from the device may be of either a pure (monochromatic) color, or a mixed (polychromatic) color, and may consist solely of light emitted from the QDs themselves, or of a mixture of light emitted from the QDs and light emitted from the primary source. The QDs desirably are composed of an undoped semiconductor such as CdSe, and may optionally be overcoated to increase photoluminescence."},
+        "US8053972B2:claim1": {"location": "Claim 1", "text": "1. A white light emitting device comprising: a primary light source; and at least a first layer in optical communication with the primary light source and comprising a matrix including a polydisperse size distribution of quantum dots adapted to convert light from the light source to a mixed color or white light; wherein the matrix is physically separated from the primary light source and is formed in a concentric conformation."},
+        "US8053972B2:claim2": {"location": "Claim 2", "text": "2. The white light emitting device of claim 1, wherein the primary light source comprises a blue LED light source and wherein the matrix comprises a first population of quantum dots of a material and size adapted to emit red secondary light and a second population of quantum dots of a material and size adapted to emit green secondary light."},
+        "US8053972B2:claim3": {"location": "Claim 3", "text": "3. The white light emitting device of claim 2, wherein the quantum dots in the first and second population each comprise a core comprising a material independently selected from the group comprising CdS, CdSe, CdTe, InP, alloys thereof, and mixtures thereof."}
+      }
+    },
+    "CN108559503B": {
+      "title": "Cs2AgBiBr6 double perovskite and preparation method thereof (machine-translated title: 'Cs (volatile organic Compounds)2AgBiBr6Double perovskite and preparation method thereof')",
+      "url": "https://patents.google.com/patent/CN108559503B/en",
+      "jurisdiction": "CN",
+      "language": "zh (page shown via machine translation)",
+      "publication_date": "2020-07-07",
+      "publication_date_A": "2018-09-21",
+      "filing_date": "2018-03-30",
+      "priority_date": "2018-03-30",
+      "assignee": "Huazhong University of Science and Technology",
+      "sections": {
+        "CN108559503B:abstract": {"location": "Abstract (machine translation)", "text": "The invention discloses a Cs2AgBiBr6The preparation method introduces two-step crystallization process to avoid Cs2AgBiBr6The perovskite has the phenomenon of component segregation in an organic solvent. Mainly comprises the following steps: adopting an anti-solvent to titrate a precursor solution, removing early crystallization byproducts, and obtaining clear liquid as Cs after centrifugal separation2AgBiBr6The perovskite crystal growth solution is slowly synthesized into Cs through the antisolvent crystallization process2AgBiBr6A perovskite material."},
+        "CN108559503B:claim1": {"location": "Claim 1 (machine translation)", "text": "1. Cs (volatile organic Compounds)2AgBiBr6A method for preparing a double perovskite, comprising: (1) cesium bromide, silver bromide and bismuth tribromide are reacted in a ratio of 2: 1: dissolving the mixture in an organic solvent after mixing the molar ratio of X to obtain a precursor solution; (2) and (3) dropwise adding an anti-solvent into the precursor solution to ensure that the volume ratio of the precursor solution to the anti-solvent is 1: y, removing segregated crystals to obtain a solid-liquid mixture; (3) centrifuging the solid-liquid mixture, loading the supernatant into a first container, sealing the first container with a sealing film, uniformly pricking a plurality of holes on the sealing film with needles, placing the first container into a second container containing an anti-solvent with the same volume as the supernatant, sealing the second container, and separating out pure-phase Cs after the anti-solvent volatilizes into the first container2AgBiBr6A double perovskite; wherein X is more than or equal to 1, and Y is more than or equal to 1; the organic solvent is DMF, DMSO or a mixed solution of the DMF and the DMSO in any proportion, and the anti-solvent is dichloromethane, chlorobenzene or turpentine absolute alcohol."},
+        "CN108559503B:claim2": {"location": "Claim 2 (machine translation)", "text": "2. A Cs of claim 12AgBiBr6The preparation method of the double perovskite is characterized in that the value range of X is preferably as follows: x is more than or equal to 1 and less than or equal to 5."},
+        "CN108559503B:claim5": {"location": "Claim 5 (machine translation)", "text": "5. A Cs according to claim 1 or 22AgBiBr6A process for the preparation of a double perovskite, characterized in that the cesium bromide concentration is in the range of 0.1 to 0.5 mol/L."},
+        "CN108559503B:claim6": {"location": "Claim 6 (machine translation)", "text": "6. A Cs according to claim 1 or 22AgBiBr6The preparation method of the double perovskite is characterized in that the temperature of the anti-solvent volatilization in the step (3) is controlled to be 20-40 ℃."},
+        "CN108559503B:claim7": {"location": "Claim 7 (machine translation)", "text": "7. A Cs according to claim 62AgBiBr6The preparation method of the double perovskite is characterized in that the temperature of the anti-solvent volatilization in the step (3) is controlled at 30 ℃."},
+        "CN108559503B:desc-steps": {"location": "Disclosure of Invention (machine translation)", "text": "(1) mixing cesium bromide, silver bromide and bismuth tribromide according to the molar ratio of 2: 1: X, and dissolving in an organic solvent to obtain a precursor solution; (2) dropwise adding an anti-solvent into the precursor solution to enable the volume ratio of the precursor solution to the anti-solvent to be 1: Y, and removing the meta-crystallization to obtain a solid-liquid mixture; (3) centrifuging the solid-liquid mixture, loading the supernatant into a first container, sealing the first container with a sealing film, uniformly pricking holes on the sealing film with needles, placing the first container into a second container containing an anti-solvent with the same volume as the supernatant, sealing the second container, and separating out the anti-solvent when the anti-solvent volatilizes into the first containerPure phase Cs2AgBiBr6A double perovskite;"},
+        "CN108559503B:desc-example1": {"location": "Example 1 (machine translation)", "text": "1. 0.212g CsBr, 0.0939g AgBr and 0.224g BiBr were weighed out3(the molar ratio is 2: 1), dissolving in 5ml of DMF, heating and stirring at 60 ℃ for dissolving for about 2h to obtain 0.1mol/L CABB precursor solution."},
+        "CN108559503B:desc-example2": {"location": "Example 2 (machine translation)", "text": "1. 0.212g CsBr, 0.0939g AgBr and 0.448g BiBr were weighed out3(the molar ratio is 2: 1: 2), dissolving in 5ml of a 1: 1 mixed solvent of DMF and DMSO, and heating and stirring at 50 ℃ for about 2h to obtain a CABB precursor solution."}
+      }
+    },
+    "US20170194101A1": {
+      "title": "Halide double perovskite Cs2AgBiBr6 solar-cell absorber having long carrier lifetimes",
+      "url": "https://patents.google.com/patent/US20170194101A1/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "2017-07-06",
+      "filing_date": "2017-01-03",
+      "priority_date": "2015-12-31",
+      "assignee": "Leland Stanford Junior University (Karunadasa, Slavney)",
+      "sections": {
+        "US20170194101A1:abstract": {"location": "Abstract", "text": "A solar-cell absorber layer for use in solar cells including tandem solar cells, is made of a metal-halide double perovskite material. The metal-halide double perovskite material has the formula A2BB′X6, where A is an inorganic cation, an organic cation, or a mixture of organic and inorganic cations where B and B′ are metals, and where X is a halide or a mixture of halides. For example, A can be Cs, Rb, K, Ba, CH3NH3, (NH2)2CH, or a mixture where B is Bi, Ag, Sn, In, Sb, Cu, Na, K, or Au of a predetermined oxidation state, and where B′ is Bi, Ag, Sn, In, Sb, Ga, Cu, or Au of various oxidation states, and where X is Br, I, Cl, F, or a mixture. One example of the metal-halide double perovskite material is Cs2BiAgBr6."},
+        "US20170194101A1:claim1": {"location": "Claim 1", "text": "1. A solar cell comprising a solar-cell absorber layer made of a metal-halide double perovskite material."},
+        "US20170194101A1:claim2": {"location": "Claim 2", "text": "2. The solar cell of claim 1, further comprising a hole-selective contact layer, an electron-selective contact layer, and first and second electrode layers."},
+        "US20170194101A1:claim5": {"location": "Claim 5", "text": "5. The solar cell of claim 1, wherein the metal-halide double perovskite material is Cs2BiAgBr6."}
+      }
+    },
+    "US7802572B2": {
+      "title": "Face mask",
+      "url": "https://patents.google.com/patent/US7802572B2/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "2010-09-28",
+      "filing_date": "2005-09-20",
+      "priority_date": "2004-09-20",
+      "assignee": "Sutter Bay Hospitals (Jeanne Hahne)",
+      "sections": {
+        "US7802572B2:abstract": {"location": "Abstract", "text": "A medical face mask comprising a central transparent portion, an outer filter portion and, optionally, one or more antimicrobial agents is described."},
+        "US7802572B2:claim1": {"location": "Claim 1", "text": "1. A face mask comprising (a) a transparent air-impermeable central portion that directs a wearer's breath downward; (b) an air-permeable outer portion surrounding and secured to the central transparent portion; (c) a head strap affixed to the outer portion or transparent portion; (d) one or more antimicrobial agents coated onto or embedded into the air-permeable outer portion; and (e) a rigid portion that defines a single conic section that extends into the transparent portion at an approximately 90° angle relative to the top edge of the transparent portion to form a beak-shaped mask."},
+        "US7802572B2:desc-transparent-def": {"location": "Detailed description", "text": "transparent refers to any material which permits a sufficient amount of visible light having wavelengths within the range of about 3900 angstroms to about 7700 angstroms to pass therethrough such that a viewer on one side of such material may discern an object or a feature of an object on the other side of and in relatively close proximity to such material."},
+        "US7802572B2:desc-transparent-term": {"location": "Detailed description", "text": "the term encompasses materials that are translucent, tinted, frosted or the like."},
+        "US7802572B2:desc-lips": {"location": "Detailed description", "text": "the central transparent portion 11 is of sufficient size and is secured to the outer filter portion 10 so as to permit viewing of at least a portion of at least one and preferably both of the wearer's lips."}
+      }
+    },
+    "CN115863457A": {
+      "title": "Solar cell based on non-lead Cs2AgBiBr6 double perovskite thin film and preparation method thereof",
+      "url": "https://patents.google.com/patent/CN115863457A/en",
+      "jurisdiction": "CN",
+      "language": "zh (page shown via machine translation)",
+      "publication_date": "2023-03-28",
+      "filing_date": "2022-11-30",
+      "priority_date": "2022-11-30",
+      "assignee": "Yunnan Normal University",
+      "legal_status": "Pending",
+      "sections": {
+        "CN115863457A:abstract": {"location": "Abstract (machine translation)", "text": "The invention relates to a method for preparing a lead-free Cs-based composite material 2 AgBiBr 6 A solar cell with double perovskite thin films and a preparation method thereof belong to the technical field of novel perovskite solar cells. The perovskite solar cell device structure sequentially comprises a transparent conductive glass cathode, an electron transmission layer, a perovskite light absorption layer and a counter electrode from bottom to top; the perovskite light absorption layer is prepared by adopting a two-step spin coating method, and AgBr and BiBr are firstly adopted 3 Dissolving in dimethyl sulfoxide, fully dissolving, spin-coating on a transparent conductive glass cathode substrate, and annealing at a certain temperature to remove the dimethyl sulfoxide solvent; then, csBr is dissolved by adopting green solvent water and is coated beforeAnnealing at a certain temperature on a one-step substrate to obtain the required Cs 2 AgBiBr 6 A film."},
+        "CN115863457A:claim1": {"location": "Claim 1 (machine translation)", "text": "1. Based on non-lead Cs 2 AgBiBr 6 The solar cell of the double perovskite thin film is characterized by sequentially comprising a transparent conductive glass cathode, a compact titanium dioxide layer, a mesoporous titanium dioxide layer, a perovskite light absorption layer and a counter electrode from bottom to top, wherein the transparent conductive glass cathode is fluorine-doped indium tin oxide, and the perovskite light absorption layer is Cs 2 AgBiBr 6 And the counter electrode is a carbon electrode."},
+        "CN115863457A:claim7": {"location": "Claim 7 (machine translation)", "text": "7. The non-lead Cs-based composition of claim 6 2 AgBiBr 6 The preparation method of the solar cell with the double perovskite thin film is characterized by comprising the following steps: in the step (A), the spin coating speed is 2000rpm, and the time is 30s; the annealing temperature is 80-150 ℃ and the annealing time is 10-30min."},
+        "CN115863457A:claim8": {"location": "Claim 8 (machine translation)", "text": "8. The non-lead Cs-based composition of claim 7 2 AgBiBr 6 The preparation method of the solar cell with the double perovskite thin film is characterized by comprising the following steps: and (B) the concentration of the CsBr precursor solution in the step (B) is 0.1-5.8M."},
+        "CN115863457A:claim10": {"location": "Claim 10 (machine translation)", "text": "10. The non-lead Cs-based product of claim 9 2 AgBiBr 6 The preparation method of the solar cell with the double perovskite thin film is characterized by comprising the following steps: the annealing temperature in the step (B) is 250-290 ℃, and the time is 3-30min."},
+        "CN115863457A:desc-perf": {"location": "Description, beneficial effects (machine translation)", "text": "Cs prepared based on the structure 2 AgBiBr 6 The efficiency of the double perovskite solar cell can reach 4.25%, and the double perovskite solar cell has a high open-circuit voltage of 1.201V and a filling factor of 71.1%."}
+      }
+    },
+    "CN110408993A": {
+      "title": "Preparation method of Cs2AgBiBr6 double-perovskite crystal for X-ray detection",
+      "url": "https://patents.google.com/patent/CN110408993A/en",
+      "jurisdiction": "CN",
+      "language": "zh (page shown via machine translation)",
+      "publication_date": "2019-11-05",
+      "filing_date": "2019-07-17",
+      "priority_date": "2019-06-29",
+      "assignee": "Ningbo University",
+      "legal_status": "Granted (B: CN110408993B, 2020-10-27)",
+      "sections": {
+        "CN110408993A:abstract": {"location": "Abstract (machine translation)", "text": "The invention discloses a kind of Cs for X-ray detection2AgBiBr6The preparation method of double-perovskite crystal comprising following steps: by cesium bromide, sodium acetate, bismuth bromide, four kinds of raw materials of silver bromide according to the ratio between amount of substance be (1.8~0.6): (0.2~1.4): 1: 1 mixing, obtain mixture；Hydrobromic acid solution is added into mixture and obtains growth raw material；Growth raw material is placed in a vial again, and carries out excellent sealing；Vial equipped with growth raw material is placed in controllable temperature container, growth raw material is heated at a temperature of 120 DEG C~130 DEG C, until generating transparent bright yellow solution；After generating transparent bright yellow solution, it is cooled to room temperature by 120 DEG C~130 DEG C by slow cooling three times, obtains the Cs of red, transparent2AgBiBr6Monocrystalline；Wherein, start crystallization at a temperature of 70 DEG C~85 DEG C；Advantage is that solve multicore crystallization, the lesser problem of crystalline size, and preparation cost is low."},
+        "CN110408993A:claim1": {"location": "Claim 1 (machine translation)", "text": "1. a kind of Cs for X-ray detection2AgBiBr6The preparation method of double-perovskite crystal, it is characterised in that including following step It is rapid: Step 1: by cesium bromide, sodium acetate, bismuth bromide, four kinds of raw materials of silver bromide according to the ratio between amount of substance be (1.8~0.6): (0.2~1.4): 1: 1 mixing obtains mixture；Then the hydrobromic acid solution that concentration is 0.007mol/mL is added into mixture Obtain growth raw material, the additional amount of hydrobromic acid solution limits benchmark to be added in the bismuth bromide or silver bromide with every 1mmol On the basis of the hydrobromic acid solution of 10mL~15mL；Growth raw material is placed in a vial again, and carries out excellent sealing；Step 2: the vial equipped with growth raw material is placed in controllable temperature container, to growth at a temperature of 120 DEG C~130 DEG C Raw material is heated, until generating transparent bright yellow solution；Step 3: after generating transparent bright yellow solution, being cooled to room temperature for 120 DEG C~130 DEG C by slow cooling three times, Obtain the Cs of red, transparent2AgBiBr6Monocrystalline；Wherein, start crystallization at a temperature of 70 DEG C~85 DEG C."},
+        "CN110408993A:desc-field": {"location": "Technical field (machine translation)", "text": "The present invention relates to a kind of preparation methods of crystal, more particularly, to a kind of Cs for X-ray detection2AgBiBr6It is double The preparation method of perovskite crystal."},
+        "CN110408993A:desc-bg-uses": {"location": "Background (machine translation)", "text": "Cs2AgBiBr6Unleaded double-perovskite is a kind of novel semiconductor material, is solved by way of aliovalent substitution The problem of toxicity of Pb based perovskite, and since it is with long carrier lifetime and more excellent structural stability, by It has been widely used in the fields such as photovoltaic cell, photodetection and X-ray detection."},
+        "CN110408993A:desc-emb1": {"location": "Embodiment 1, step 1 (machine translation)", "text": "Step 1: by the cesium bromide (CsBr) of 5.6mmol, the sodium acetate (CH of 2.4mmol3COONa), the bromine of 4.0mmol Change bismuth (BiBr3), the four kinds of raw materials mixing of the silver bromide (AgBr) of 4.0mmol, obtain mixture；Then it is added into mixture 50mL concentration is that the hydrobromic acid solution of 0.007mol/mL obtains growth raw material"},
+        "CN110408993A:desc-resistivity": {"location": "Embodiment 1, FIG. 3 discussion (machine translation)", "text": "As can be known from Fig. 3, Cs2AgBiBr6The resistivity of double-perovskite crystal is 6.04 × 109Ω cm, is more nowadays reported 2.59×109Ω cm is big, and higher resistivity makes background current and noise current lower, so that prepared by the present invention Cs2AgBiBr6Double-perovskite crystal is more suitable for X-ray detection."}
+      }
+    },
+    "US20240423306A1": {
+      "title": "Antimicrobial face mask",
+      "url": "https://patents.google.com/patent/US20240423306A1/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "2024-12-26",
+      "filing_date": "2024-08-23",
+      "priority_date": "2022-02-23",
+      "assignee": "Nexvera LLC",
+      "legal_status": "Pending",
+      "sections": {
+        "US20240423306A1:abstract": {"location": "Abstract", "text": "An antimicrobial face mask that includes a triboelectric nanogenerator (TENG) membrane interior portion. The face mask also includes one or more antimicrobial substances. In some examples, the face mask includes both copper and silver, each of which has antimicrobial properties and together have a greater antimicrobial effect than each of them individually. The face mask improves upon existing personal protective equipment (PPE) face masks to reduce transmission and infection from microbial pathogens, including SARS-CoV-2, its variants, other viruses and various forms of bacteria."},
+        "US20240423306A1:claim1": {"location": "Claim 1", "text": "1. A face mask comprising: an interior antimicrobial layer and an exterior antimicrobial layer; and a triboelectric nanogenerator (TENG) membrane located between the interior and exterior antimicrobial layers, wherein the TENG membrane comprises two different flexible layers having distinct triboelectric polarities."},
+        "US20240423306A1:claim3": {"location": "Claim 3", "text": "3. The face mask of claim 1, wherein the exterior antimicrobial layer comprises copper."},
+        "US20240423306A1:claim4": {"location": "Claim 4", "text": "4. The face mask of claim 3, wherein the exterior antimicrobial layer comprises a sputtered copper polyester fabric."},
+        "US20240423306A1:desc-virion": {"location": "Background (machine-free)", "text": "The SARS-CoV-2 virion is measured at 0.05 to 0.12 microns and therefore may penetrate through the filter fabric of the N95 mask."}
+      }
+    },
+    "US3664335A": {
+      "title": "Surgical face mask",
+      "url": "https://patents.google.com/patent/US3664335A/en",
+      "jurisdiction": "US",
+      "language": "en",
+      "publication_date": "1972-05-23",
+      "filing_date": "1970-02-24",
+      "priority_date": "1970-02-24",
+      "assignee": "International Paper Company (Boucher, Kurilla, Slepp)",
+      "sections": {
+        "US3664335A:abstract": {"location": "Abstract", "text": "Disposable surgical face mask comprising a flexible porous pad capable of covering the nose and the mouth of the wearer, the flexible porous pad having an inner layer of non-woven fiber material, an outer layer of non-woven fiber material, and a central layer of filter material. The three layers are stitched together along their horizontal and vertical edges. An elastic binding is secured onto each vertical edge of the flexible porous pad. The flexible porous pad has a first vertical double pleat structure and a second vertical double pleat structure. The first and second vertical double pleat structures are parallel to one another and are spaced a horizontal distance from one another."},
+        "US3664335A:claim1": {"location": "Claim 1 (single claim; original typos preserved)", "text": "1. A surgical face mask, comprising: a. a generally rectangular flexible porous pad having a pair of opposed parallel horizontal edges and a pair of opposed parallel vertical edges, said pad having an inner layer and an outer layer of non-woven material and a central layer of filter material, said layers being secured together along their horizontal and vertical edges to form said flexible porous pad; b. a pair of elastic binding elements each having a relaxed length which is substantially shorter than the vertical dimension of said pad and each having a distended length substantially equal to the vertical dimension of said pad, said binding elements each being secured to a respective vertical edge of said pad while distended to said distended length thereof so that each of said vertical edges of said pad will be crimped throughout their lengths upon relaxation of said elastic binding elements; c. a pair of spaced parallel vertical pleats in said pad extending from the top horizontal edge to the bottom horizontal edge of said pad and defining, respectively, a ''''Z'''' configuration and a reversed ''''Z'''' configuration in a plane parallel to said horizontal edges, said pleats together defining therebetween a configuration adapted to be popped out into a generally C-shaped vertical cavity extending substantially from the top horizontal edge to the bottom horizontal edge of said pad and being semirigid to maintain said pad away from tHe wearer''s nose and mouth in service; and d. means for retaining said flexible porous pad over the nose and mouth of a wearer."}
+      }
+    }
+  }
+}
